@@ -3,10 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>BLE Car Control</title>
+  <title>Simple BLE Car Test</title>
   <style>
-    * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
@@ -21,13 +19,13 @@
 
     .container {
       width: 100%;
-      max-width: 1050px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      max-width: 950px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 24px;
       padding: 28px;
       backdrop-filter: blur(10px);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
     }
 
     .topbar {
@@ -47,18 +45,28 @@
     .subtitle {
       margin-top: 8px;
       color: #cbd5e1;
-      font-size: 1rem;
     }
 
-    .connect-btn {
-      background: #22c55e;
-      color: white;
+    .btn {
       border: none;
       border-radius: 14px;
       padding: 14px 22px;
       font-size: 1rem;
       cursor: pointer;
       font-weight: bold;
+      color: white;
+    }
+
+    .connect-btn {
+      background: #22c55e;
+    }
+
+    .stop-btn {
+      background: #ef4444;
+      width: 100%;
+      margin-top: 18px;
+      padding: 16px;
+      font-size: 1.1rem;
     }
 
     .grid {
@@ -68,16 +76,10 @@
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255,255,255,0.08);
       border-radius: 20px;
       padding: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-
-    .card h2 {
-      margin-top: 0;
-      font-size: 1.2rem;
-      margin-bottom: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
     .status-pill {
@@ -97,18 +99,12 @@
 
     .info-row {
       margin: 12px 0;
-      font-size: 1rem;
       color: #e2e8f0;
     }
 
     .highlight {
       color: #38bdf8;
       font-weight: bold;
-    }
-
-    .instructions {
-      line-height: 1.7;
-      color: #e2e8f0;
     }
 
     .keys-panel {
@@ -133,8 +129,8 @@
       border-radius: 16px;
       font-size: 1.4rem;
       font-weight: bold;
-      background: rgba(255, 255, 255, 0.08);
-      border: 2px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.12);
       transition: all 0.12s ease;
       user-select: none;
     }
@@ -144,22 +140,16 @@
       color: #082f49;
       border-color: #7dd3fc;
       transform: scale(1.04);
-      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
-    }
-
-    .command-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-top: 18px;
+      box-shadow: 0 0 20px rgba(56,189,248,0.35);
     }
 
     .command-box {
+      margin-top: 18px;
       text-align: center;
       padding: 16px;
       border-radius: 16px;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(15,23,42,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
     .command-label {
@@ -179,9 +169,9 @@
       margin-top: 16px;
       padding: 14px;
       border-radius: 16px;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      height: 160px;
+      background: rgba(15,23,42,0.7);
+      border: 1px solid rgba(255,255,255,0.08);
+      height: 220px;
       overflow: auto;
       font-family: Consolas, monospace;
       font-size: 0.92rem;
@@ -189,20 +179,10 @@
       white-space: pre-wrap;
     }
 
-    .legend {
-      margin-top: 14px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      color: #e2e8f0;
-      font-size: 0.96rem;
-    }
-
     @media (max-width: 850px) {
-      .grid { grid-template-columns: 1fr; }
-      h1 { font-size: 1.8rem; }
-      .key { width: 64px; height: 64px; }
-      .command-grid { grid-template-columns: 1fr; }
+      .grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -211,9 +191,9 @@
     <div class="topbar">
       <div>
         <h1>BLE Car Control</h1>
-        <div class="subtitle">HM-10 keyboard controller with live command display</div>
+        <div class="subtitle">Simple WASD test for HM-10</div>
       </div>
-      <button class="connect-btn" onclick="connectBLE()">Connect Device</button>
+      <button class="btn connect-btn" onclick="connectBLE()">Connect Device</button>
     </div>
 
     <div class="grid">
@@ -222,15 +202,11 @@
         <div id="status" class="status-pill">Not Connected</div>
 
         <div class="info-row">Device: <span id="deviceName" class="highlight">None</span></div>
-        <div class="info-row">Keys Pressed: <span id="pressedKeys" class="highlight">None</span></div>
+        <div class="info-row">Current Key: <span id="currentKey" class="highlight">None</span></div>
 
-        <div class="instructions">
-          <p>1. Click <strong>Connect Device</strong>.</p>
-          <p>2. Choose your <strong>HM-10</strong> in the popup.</p>
-          <p>3. Use <strong>W A S D</strong> to send commands.</p>
-          <p>4. Hold two keys for combined movement.</p>
-          <p>5. Release all keys to send stop.</p>
-        </div>
+        <p>Press <strong>W</strong>, <strong>A</strong>, <strong>S</strong>, or <strong>D</strong> to send that exact letter.</p>
+        <p>Press <strong>Spacebar</strong> or click <strong>STOP</strong> to send <strong>X</strong>.</p>
+        <p>This is better for motor testing because it does not instantly stop on key release.</p>
 
         <div class="log" id="eventLog"></div>
       </div>
@@ -249,36 +225,20 @@
           </div>
         </div>
 
-        <div class="command-grid">
-          <div class="command-box">
-            <div class="command-label">Current Input</div>
-            <div id="commandValue" class="command-value">X</div>
-          </div>
-
-          <div class="command-box">
-            <div class="command-label">Last Sent to Bluetooth</div>
-            <div id="lastSentValue" class="command-value">—</div>
-          </div>
+        <div class="command-box">
+          <div class="command-label">Last Sent to Bluetooth</div>
+          <div id="lastSentValue" class="command-value">—</div>
         </div>
 
-        <div class="legend">
-          <div><strong>W</strong> = Forward</div>
-          <div><strong>S</strong> = Backward</div>
-          <div><strong>A</strong> = Left</div>
-          <div><strong>D</strong> = Right</div>
-          <div><strong>W + A</strong> = FL</div>
-          <div><strong>W + D</strong> = FR</div>
-          <div><strong>S + A</strong> = BL</div>
-          <div><strong>S + D</strong> = BR</div>
-        </div>
+        <button class="btn stop-btn" onclick="sendStop()">STOP (X)</button>
       </div>
     </div>
   </div>
 
   <script>
     let characteristic = null;
-    let pressed = new Set();
     let lastSent = "";
+    let activeVisualKey = null;
 
     const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
     const CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
@@ -289,67 +249,43 @@
       log.textContent = `[${time}] ${msg}\n` + log.textContent;
     }
 
-    function updatePressedKeys() {
-      const keys = Array.from(pressed).map(k => k.toUpperCase()).join(", ");
-      document.getElementById("pressedKeys").textContent = keys || "None";
-
+    function setActiveKey(key) {
       ["w", "a", "s", "d"].forEach(k => {
         const el = document.getElementById(`key-${k}`);
-        if (pressed.has(k)) el.classList.add("active");
+        if (k === key) el.classList.add("active");
         else el.classList.remove("active");
       });
+
+      document.getElementById("currentKey").textContent = key ? key.toUpperCase() : "None";
+      activeVisualKey = key;
     }
 
-    function buildCommand() {
-      const hasW = pressed.has("w");
-      const hasA = pressed.has("a");
-      const hasS = pressed.has("s");
-      const hasD = pressed.has("d");
-
-      let cmd = "";
-      if (hasW) cmd += "W";
-      if (hasS) cmd += "S";
-      if (hasA) cmd += "A";
-      if (hasD) cmd += "D";
-      if (cmd === "") cmd = "X";
-
-      return cmd;
-    }
-
-    function updateCommandDisplay(cmd) {
-      document.getElementById("commandValue").textContent = cmd;
-    }
-
-    function updateLastSentDisplay(cmd) {
+    function setLastSent(cmd) {
       document.getElementById("lastSentValue").textContent = cmd;
     }
 
     async function sendCommand(cmd) {
-      updateCommandDisplay(cmd);
+      setLastSent(cmd);
 
       if (!characteristic) {
         logMessage(`Not sent (not connected): ${cmd}`);
         return;
       }
 
-      if (cmd === lastSent) return;
-
       try {
         const data = new TextEncoder().encode(cmd);
         await characteristic.writeValue(data);
         lastSent = cmd;
-        updateLastSentDisplay(cmd);
         logMessage(`Sent to Bluetooth: ${cmd}`);
       } catch (error) {
-        logMessage(`Send failed for ${cmd}`);
         console.error(error);
+        logMessage(`Send failed: ${cmd}`);
       }
     }
 
-    async function updateAndSend() {
-      updatePressedKeys();
-      const cmd = buildCommand();
-      await sendCommand(cmd);
+    async function sendStop() {
+      setActiveKey(null);
+      await sendCommand("X");
     }
 
     async function connectBLE() {
@@ -371,39 +307,47 @@
 
         logMessage(`Connected to ${device.name || "HM-10"}`);
       } catch (error) {
-        logMessage("Connection failed");
         console.error(error);
-        alert("Connection failed. Make sure Chrome/Edge is used and the HM-10 is powered.");
+        alert("Connection failed. Make sure Chrome/Edge is used and the HM-10 is powered on.");
       }
     }
 
     document.addEventListener("keydown", async (e) => {
       const key = e.key.toLowerCase();
-      if (!["w", "a", "s", "d"].includes(key)) return;
 
-      e.preventDefault();
+      if (["w", "a", "s", "d"].includes(key)) {
+        e.preventDefault();
+        if (e.repeat) return;
 
-      if (!pressed.has(key)) {
-        pressed.add(key);
-        await updateAndSend();
+        setActiveKey(key);
+        await sendCommand(key.toUpperCase());
+      }
+
+      if (e.code === "Space") {
+        e.preventDefault();
+        await sendStop();
       }
     });
 
     document.addEventListener("keyup", async (e) => {
       const key = e.key.toLowerCase();
-      if (!["w", "a", "s", "d"].includes(key)) return;
-
-      e.preventDefault();
-
-      if (pressed.has(key)) {
-        pressed.delete(key);
-        await updateAndSend();
+      if (["w", "a", "s", "d"].includes(key)) {
+        if (activeVisualKey === key) {
+          setActiveKey(null);
+        }
       }
     });
 
-    updatePressedKeys();
-    updateCommandDisplay("X");
-    updateLastSentDisplay("—");
+    window.addEventListener("blur", async () => {
+      await sendStop();
+    });
+
+    document.addEventListener("visibilitychange", async () => {
+      if (document.hidden) {
+        await sendStop();
+      }
+    });
+
     logMessage("Page ready");
   </script>
 </body>
