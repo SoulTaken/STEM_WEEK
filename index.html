@@ -1,145 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simple WASD BLE Test</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-      margin: 0;
-      padding: 24px;
-    }
+#include <SoftwareSerial.h>
 
-    .box {
-      max-width: 700px;
-      margin: 0 auto;
-      background: #1e293b;
-      padding: 24px;
-      border-radius: 16px;
-    }
+SoftwareSerial BT(10, 9); // RX, TX
 
-    button {
-      padding: 12px 18px;
-      font-size: 16px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      background: #22c55e;
-      color: white;
-      font-weight: bold;
-    }
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Serial.println("Ready...");
+}
 
-    .status, .current, .sent {
-      margin-top: 16px;
-      font-size: 18px;
-    }
+void loop() {
+  if (BT.available()) {
+    char c = BT.read();
 
-    .big {
-      font-size: 32px;
-      font-weight: bold;
-      color: #38bdf8;
-    }
-
-    .log {
-      margin-top: 20px;
-      background: #0b1220;
-      padding: 14px;
-      border-radius: 10px;
-      min-height: 120px;
-      white-space: pre-wrap;
-      font-family: Consolas, monospace;
-    }
-  </style>
-</head>
-<body>
-  <div class="box">
-    <h1>Simple WASD BLE Test</h1>
-    <p>Press W, A, S, D. Releasing sends X.</p>
-
-    <button onclick="connectBLE()">Connect</button>
-
-    <div class="status">Status: <span id="status">Not Connected</span></div>
-    <div class="current">Current key: <span id="current" class="big">None</span></div>
-    <div class="sent">Last sent: <span id="lastSent" class="big">None</span></div>
-
-    <div class="log" id="log">Page ready\n</div>
-  </div>
-
-  <script>
-    let characteristic = null;
-    let activeKey = null;
-
-    const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
-    const CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
-
-    function addLog(msg) {
-      const log = document.getElementById("log");
-      const time = new Date().toLocaleTimeString();
-      log.textContent = `[${time}] ${msg}\n` + log.textContent;
-    }
-
-    async function connectBLE() {
-      try {
-        const device = await navigator.bluetooth.requestDevice({
-          filters: [{ namePrefix: "HM" }],
-          optionalServices: [SERVICE_UUID]
-        });
-
-        const server = await device.gatt.connect();
-        const service = await server.getPrimaryService(SERVICE_UUID);
-        characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
-
-        document.getElementById("status").textContent = "Connected to " + (device.name || "HM-10");
-        addLog("Connected");
-      } catch (err) {
-        console.error(err);
-        addLog("Connection failed");
-      }
-    }
-
-    async function sendValue(val) {
-      document.getElementById("lastSent").textContent = val;
-
-      if (!characteristic) {
-        addLog("Not connected, did not send: " + val);
-        return;
-      }
-
-      try {
-        const data = new TextEncoder().encode(val);
-        await characteristic.writeValue(data);
-        addLog("Sent: " + val);
-      } catch (err) {
-        console.error(err);
-        addLog("Failed to send: " + val);
-      }
-    }
-
-    document.addEventListener("keydown", async (e) => {
-      const key = e.key.toUpperCase();
-
-      if (!["W", "A", "S", "D"].includes(key)) return;
-      if (activeKey === key) return;
-
-      activeKey = key;
-      document.getElementById("current").textContent = key;
-      await sendValue(key);
-    });
-
-    document.addEventListener("keyup", async (e) => {
-      const key = e.key.toUpperCase();
-
-      if (!["W", "A", "S", "D"].includes(key)) return;
-
-      if (activeKey === key) {
-        activeKey = null;
-        document.getElementById("current").textContent = "None";
-        await sendValue("X");
-      }
-    });
-  </script>
-</body>
-</html>
+    Serial.print("Received: ");
+    Serial.println(c);
+  }
+}
