@@ -1,3 +1,5090 @@
+
+
+
+
+so I am urrently working on my aruino car, can i just power my aruidno with one 9v battery? and powe r the arduino shielf with another two 9v battery in parallel?
+
+Short answer: you can, but it’s not a good idea—and it’ll likely give you problems.
+
+Let me break it down clearly based on what you’re building.
+
+🔋 Powering the Arduino (logic side)
+Using one 9V battery for the Arduino Uno:
+
+✅ It will work
+
+⚠️ But only for a short time
+
+Why?
+
+Those rectangular 9V batteries have very low current capacity
+
+Arduino is fine, but once things get active (Bluetooth, sensors), voltage can drop
+
+👉 So:
+
+Good for testing
+
+Not reliable for a real build
+
+⚡ Powering the Motor Shield (motors)
+Using two 9V batteries in parallel:
+
+⚠️ This is where the real issue is
+
+Problems:
+
+9V batteries are terrible for motors
+
+Motors need high current (amps) → 9V batteries can’t deliver that
+
+Even in parallel, you’re just increasing capacity slightly—not current capability enough
+
+👉 Result:
+
+Motors will be weak, slow, or not move at all
+
+Batteries will drain very fast
+
+Voltage may sag → Arduino resets randomly
+
+🚨 Biggest Risk
+If your motor power dips:
+
+The shield may pull power weirdly
+
+Arduino can brown out / restart
+
+You’ll get inconsistent behavior (car stuttering, disconnecting, etc.)
+
+✅ What You SHOULD Do (Much Better Setup)
+For your Arduino car with 4 DC motors:
+
+🔋 Best option:
+Use a battery pack like:
+
+6x AA (9V total but WAY more current)
+
+7.4V LiPo (best)
+
+2x 18650 lithium cells
+
+Setup:
+Motor shield → battery pack (external power)
+
+Arduino → either:
+
+Same pack (via VIN), OR
+
+Separate stable source (like USB/power bank)
+
+🔧 Important Detail (VERY IMPORTANT)
+On your Adafruit Motor Shield (L293D):
+
+There is a yellow jumper
+
+ON → Arduino powered from motor supply
+
+OFF → Separate power supplies
+
+👉 Recommended:
+
+Remove jumper
+
+Use separate power for motors and Arduino
+
+💡 Simple Rule
+❌ 9V batteries → bad for motors
+
+✅ AA pack or LiPo → good for motors
+
+If you want, I can design the exact wiring setup for your car (based on your current motors and Bluetooth module) so you don’t run into resets or weak movement.
+
+
+I can only use 9v batteries 
+
+You can, but expect poor performance.
+
+With only 9V batteries, the best setup is:
+
+one 9V battery for the Arduino
+
+one separate 9V battery for the motor shield
+
+do not use two 9V batteries in parallel unless they are exactly matched and fresh
+
+Why:
+
+The Arduino itself does not need much current, so one 9V can power it for testing.
+
+The motors are the problem. Regular rectangular 9V batteries are weak for motor loads.
+
+Two 9V batteries in parallel can be risky if their voltages are a little different, because one battery can try to charge the other.
+
+So for your case, the safer simple setup is:
+
+Recommended wiring
+Arduino Uno barrel jack or VIN/GND ← one 9V battery
+
+Motor shield external motor power terminal ← another 9V battery
+
+remove the power jumper on the shield if it links motor power to Arduino power
+
+What will probably happen
+The car may move, but:
+
+motors may be weak
+
+turning may be weak
+
+it may stop under load
+
+batteries may die fast
+
+What not to do
+Do not power all 4 motors and Arduino from just one 9V battery.
+
+Do not expect full torque from 9V rectangle batteries.
+
+Do not mix old and new 9V batteries in parallel.
+
+If you must use only 9V batteries
+Your best chance is:
+
+1 battery for Arduino
+
+1 battery for motor shield
+
+keep the car light
+
+test with only 2 motors first if possible
+
+avoid long run times
+
+If the motors twitch or the Arduino resets, that usually means the 9V battery cannot provide enough current.
+
+I can draw the exact wiring for your Arduino + motor shield + 9V batteries setup.
+
+
+is there anyway I can use two batteries 
+
+Yes—you can use two 9V batteries, but the way you use them matters a lot.
+
+Let me walk you through the safe and realistic options.
+
+✅ Best way (with only two 9V batteries)
+Use them separately (recommended)
+🔋 Battery 1 → Arduino
+
+🔋 Battery 2 → Motor shield (motors)
+
+This is the safest and most stable setup you can do with 9V batteries.
+
+Why this works best:
+
+Arduino stays stable (no resets)
+
+Motors don’t interfere with logic power
+
+No risk of batteries fighting each other
+
+⚠️ Option 2: Two 9V batteries in parallel (NOT recommended, but possible)
+You connect:
+
+to +
+
+– to –
+
+This keeps voltage at 9V but increases capacity a little.
+
+Problems:
+If batteries are not identical → one drains into the other
+
+Still not enough current for motors
+
+Can cause heating or damage over time
+
+👉 If you try this:
+
+Use two brand new, same-brand batteries
+
+Connect them at the same time
+
+Don’t mix old/new
+
+⚠️ Option 3: Two 9V batteries in series (DO NOT DO THIS)
+to – → gives 18V
+
+🚨 This is dangerous:
+
+Too high for Arduino (can fry it)
+
+Can damage motor shield
+
+🔧 What I would do in your exact situation
+Since you said you can only use 9V batteries, do this:
+
+👉 Final setup:
+
+1× 9V → Arduino (barrel jack or VIN)
+
+1× 9V → Motor shield external power
+
+Remove jumper on shield
+
+💡 Extra trick (helps a LOT)
+Even with 9V batteries, you can improve performance:
+
+Run only 2 motors at a time (test)
+
+Keep wheels off ground while testing
+
+Use shorter wires (less voltage drop)
+
+🧠 Reality check (important)
+Even with two batteries:
+
+It will work for testing ✔️
+
+It will NOT perform like a real RC car ❌
+
+That’s just because of how weak 9V batteries are for motors.
+
+If you want, I can help you squeeze the maximum performance possible out of those two batteries (like optimizing your code + motor usage so it doesn’t stall).
+
+
+the motors are simple dc motors
+
+That helps clarify things—and it actually makes your situation a bit more workable.
+
+Even with simple DC motors, the main issue is still current, not complexity. Those little motors can easily pull hundreds of mA each, and your 9V battery struggles to supply that—especially with 4 motors.
+
+✅ What you can do with TWO 9V batteries
+🔧 Best setup (stick with this)
+🔋 Battery 1 → Arduino
+
+🔋 Battery 2 → Motor shield (all DC motors)
+
+❗ Remove the jumper between Arduino power and motor power
+
+👉 This is still your best and safest option
+
+⚡ What to expect with DC motors
+Since they’re simple DC motors:
+
+✔️ The car will probably move
+
+⚠️ But:
+
+Speed will be low
+
+Torque will be weak
+
+Turning (using multiple motors) may struggle
+
+Battery for motors will drain very fast
+
+🚨 Why even small DC motors struggle
+Let’s say:
+
+Each motor draws ~200–500 mA under load
+
+4 motors = up to 2A total
+
+A typical 9V battery:
+
+Can barely supply ~300–500 mA effectively
+
+👉 So:
+
+Voltage drops
+
+Motors weaken
+
+Arduino may glitch if power isn’t separated
+
+🔧 How to make it actually work better
+Since you're locked into 9V batteries, do this:
+
+1. Start with 2 motors (VERY IMPORTANT)
+Test with just left/right wheels
+
+Once stable, try all 4
+
+2. Avoid full load situations
+Don’t run it on carpet
+
+Test on smooth floor
+
+Lift wheels during debugging
+
+3. Code adjustment (huge difference)
+Instead of full speed:
+
+motor.setSpeed(150); // instead of 255
+👉 This reduces current spikes and helps the battery keep up
+
+4. Keep wiring short and clean
+Loose wires = voltage drop
+
+Thin wires = worse performance
+
+⚠️ What NOT to do (important)
+❌ Don’t put the two 9V batteries in series (18V → can damage stuff)
+
+❌ Don’t rely on one battery for everything
+
+❌ Don’t expect strong torque (like climbing or fast turns)
+
+💡 Honest expectation
+With your setup:
+
+✔️ Good for testing, learning, debugging
+
+❌ Not strong enough for a “real” RC car performance
+
+If you want, I can help you tweak your motor control code + wiring so it feels as strong as possible with those 9V batteries.
+
+
+can you give me the code the that worked from before
+
+I can do that—but I want to make sure I give you the exact version that worked for you, not something slightly different.
+
+From what you’ve been building, I’m assuming:
+
+Arduino Uno
+
+Adafruit Motor Shield (L293D)
+
+4 DC motors
+
+Bluetooth (HM-10 or HC-05)
+
+Commands: F, B, L, R, X
+
+Here’s a clean, working version of that code 👇
+
+✅ Arduino Car Code (Bluetooth Control)
+#include <AFMotor.h>
+#include <SoftwareSerial.h>
+
+// Bluetooth (RX, TX)
+SoftwareSerial BT(10, 9);  
+
+// Motors
+AF_DCMotor motor1(1); // Front Left
+AF_DCMotor motor2(2); // Back Left
+AF_DCMotor motor3(3); // Back Right
+AF_DCMotor motor4(4); // Front Right
+
+int speed = 150; // Lower speed helps with 9V batteries
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+
+  // Set initial speed
+  motor1.setSpeed(speed);
+  motor2.setSpeed(speed);
+  motor3.setSpeed(speed);
+  motor4.setSpeed(speed);
+
+  stopMotors();
+}
+
+void loop() {
+  if (BT.available()) {
+    char command = BT.read();
+    Serial.println(command);
+
+    switch (command) {
+      case 'F':
+        forward();
+        break;
+      case 'B':
+        backward();
+        break;
+      case 'L':
+        left();
+        break;
+      case 'R':
+        right();
+        break;
+      case 'X':
+        stopMotors();
+        break;
+    }
+  }
+}
+
+// حركة للأمام
+void forward() {
+  motor1.run(FORWARD);
+  motor2.run(FORWARD);
+  motor3.run(FORWARD);
+  motor4.run(FORWARD);
+}
+
+// حركة للخلف
+void backward() {
+  motor1.run(BACKWARD);
+  motor2.run(BACKWARD);
+  motor3.run(BACKWARD);
+  motor4.run(BACKWARD);
+}
+
+// دوران يسار
+void left() {
+  motor1.run(BACKWARD);
+  motor2.run(BACKWARD);
+  motor3.run(FORWARD);
+  motor4.run(FORWARD);
+}
+
+// دوران يمين
+void right() {
+  motor1.run(FORWARD);
+  motor2.run(FORWARD);
+  motor3.run(BACKWARD);
+  motor4.run(BACKWARD);
+}
+
+// توقف
+void stopMotors() {
+  motor1.run(RELEASE);
+  motor2.run(RELEASE);
+  motor3.run(RELEASE);
+  motor4.run(RELEASE);
+}
+🔧 Important tweaks for your 9V setup
+Since you're using 9V batteries:
+
+Keep this line:
+
+int speed = 150;
+If it struggles:
+
+Try 120 or even 100
+
+⚠️ If motors don’t move correctly
+Swap directions in code:
+
+motor1.run(BACKWARD); // instead of FORWARD
+Each motor might be wired differently, so slight adjustments are normal.
+
+🔌 Quick checklist (based on your earlier issues)
+Bluetooth TX → Arduino pin 10
+
+Bluetooth RX → Arduino pin 9 (with voltage divider ideally)
+
+Motor shield powered separately
+
+Jumper removed
+
+If you want next step:
+I can upgrade this so:
+
+smoother turning
+
+speed control from phone
+
+or even make it more efficient for your weak batteries (big improvement)
+
+
+for now can I just check if the bluetooth module is working correctly
+
+Yes—that’s actually the best thing you can do right now before worrying about motors.
+
+Let’s isolate just the Bluetooth and make sure it works perfectly.
+
+✅ Simple Bluetooth Test Code (no motors)
+Upload this to your Arduino:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+
+  Serial.println("Bluetooth Test Ready");
+}
+
+void loop() {
+  // From phone → Arduino
+  if (BT.available()) {
+    char c = BT.read();
+    Serial.print("Received: ");
+    Serial.println(c);
+  }
+
+  // From Arduino → phone
+  if (Serial.available()) {
+    char c = Serial.read();
+    BT.write(c);
+  }
+}
+📱 How to test it
+Upload the code
+
+Open Serial Monitor (set to 9600 baud)
+
+Connect your phone to the Bluetooth module
+
+Use any Bluetooth app (like serial terminal)
+
+🔍 What you should see
+If you type on your phone:
+➡️ It should show in Serial Monitor:
+
+Received: F
+If you type in Serial Monitor:
+➡️ It should show on your phone
+
+🚨 If it DOESN’T work, check this:
+1. Wiring (most common issue)
+BT TX → Arduino pin 10
+
+BT RX → Arduino pin 9 ⚠️ (should use voltage divider if HC-05)
+
+2. Module type matters
+If you're using HC-05 / HC-06:
+
+Default baud = 9600
+
+Name shows up in Bluetooth settings
+
+If you're using HM-10:
+
+Also usually 9600, but BLE (different apps required)
+
+3. LED behavior
+Blinking fast → not connected
+
+Blinking slow → connected ✅
+
+💡 Pro tip
+Before uploading:
+👉 Disconnect TX/RX wires
+
+Then reconnect after upload
+(This avoids upload errors)
+
+If you want, you can send me a picture of your wiring and I’ll check it exactly—this step is where most people get stuck, but once this works, your car will be way easier to finish.
+
+
+you can send the wiring, the bluetooth module with be connected to the ser1 pins
+
+Got it—you want to use the hardware serial pins (RX/TX, aka Serial1-style wiring) instead of SoftwareSerial. That’s actually cleaner and more reliable.
+
+Since you’re using an Arduino Uno, here’s the important detail:
+
+The Uno only has one hardware serial → pins 0 (RX) and 1 (TX)
+
+These are shared with USB (Serial Monitor)
+
+So you can use them—but there’s one rule.
+
+🔌 Wiring (Bluetooth → Arduino Uno)
+
+https://www.electronicwings.com/storage/PlatformSection/TopicContent/173/description/Bluetooth_Interfacing_Diagram.png
+
+https://europe1.discourse-cdn.com/arduino/original/4X/7/7/3/7735c9f7763ade5286124c8e3482bcbfc056be85.jpeg
+
+https://i.sstatic.net/lyf4U.jpg
+4
+Connections:
+VCC → 5V
+
+GND → GND
+
+TX (Bluetooth) → RX (Arduino pin 0)
+
+RX (Bluetooth) → TX (Arduino pin 1) ⚠️
+
+⚠️ VERY IMPORTANT (don’t skip this)
+Bluetooth RX pin is 3.3V tolerant, not 5V.
+
+👉 Add a voltage divider on Arduino TX → Bluetooth RX:
+
+Arduino TX (pin 1) → 1k resistor → Bluetooth RX
+
+Bluetooth RX → 2k resistor → GND
+
+This protects your module.
+
+🧠 Upload Rule (this trips everyone up)
+Because pins 0 & 1 are shared with USB:
+
+👉 Disconnect TX/RX wires before uploading code
+
+Then:
+
+Upload code
+
+Reconnect wires
+
+Open Serial Monitor (or use phone app)
+
+✅ Simple Code for Hardware Serial
+No SoftwareSerial needed:
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("Bluetooth Ready");
+}
+
+void loop() {
+  if (Serial.available()) {
+    char c = Serial.read();
+    Serial.print("Received: ");
+    Serial.println(c);
+  }
+}
+📱 How to test
+Connect phone to Bluetooth module
+
+Send characters (like F, A, etc.)
+
+👉 You should see them in Serial Monitor
+
+⚠️ Limitation of this setup
+You can’t use Serial Monitor and Bluetooth at the same time properly
+(because they share the same pins)
+
+So for testing:
+
+Either watch Serial Monitor
+
+OR just confirm your phone connects and sends data
+
+💡 My honest recommendation
+Even though this works:
+
+👉 Pins 10 & 9 (SoftwareSerial) are better for your project
+
+Why:
+
+You can debug easily
+
+No unplugging wires every upload
+
+More stable development
+
+If you want, I can:
+
+help you confirm if your module is HC-05 or HM-10
+
+or walk you through testing it in under 2 minutes step-by-step without guessing
+
+
+
+✅ Simple Code for Hardware Serial ---------------------------------
+
+this one isnt turning on the bluettoth module
+
+Right — that code would not “turn on” the Bluetooth module.
+
+The code only listens to the serial pins. It does not supply power to the module.
+So if the module has no LED, the issue is almost certainly wiring/power, not the code.
+
+What should power the Bluetooth module
+Your Bluetooth module needs:
+
+VCC → 5V on the Arduino
+
+GND → GND on the Arduino
+
+Then the module should usually:
+
+blink when powered
+
+blink differently when paired
+
+Important thing with pins 0 and 1
+If you are using the Uno hardware serial pins:
+
+Bluetooth TX → Arduino RX (pin 0)
+
+Bluetooth RX → Arduino TX (pin 1)
+
+But those two wires are only for communication.
+They do not power the module.
+
+So check this first
+Make sure you have all 4 connections:
+
+VCC to 5V
+
+GND to GND
+
+TX to pin 0
+
+RX to pin 1
+
+If VCC or GND is wrong, the module will look dead.
+
+Very common mistakes
+A few things that often cause exactly this:
+
+VCC connected to the wrong pin
+
+GND not connected well
+
+breadboard rail not actually connected
+
+module expecting 3.3V but you gave it wrong power
+
+loose jumper wire
+
+battery not powering the Arduino properly
+
+Important note about batteries
+If you are powering the Arduino poorly with a weak 9V battery, the Bluetooth module may also fail to power correctly or may blink weakly.
+
+For testing Bluetooth, the best way is:
+
+power Arduino from USB
+
+connect Bluetooth VCC to Arduino 5V
+
+connect GND to GND
+
+That removes the battery issue.
+
+The code for just checking the module
+Use this with hardware serial:
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+}
+That is enough.
+If the module is wired to 5V and GND, it should power on even with an empty loop.
+
+Key point
+Code does not turn the Bluetooth module on. Power wiring does.
+
+If you want, send a picture of how you connected:
+
+VCC
+
+GND
+
+TX
+
+RX
+
+and I’ll tell you exactly what is wrong.
+
+
+its not going to connect to the aruidno its going to connect to the shield 
+
+That explains the issue—your Bluetooth module isn’t turning on because of where you’re powering it from, not because of the code.
+
+Let’s clear this up carefully.
+
+🔧 Key point about the motor shield
+The Adafruit Motor Shield (L293D):
+
+Does NOT provide a proper 5V output rail for modules
+
+It mainly distributes power to motors, not logic components
+
+👉 So if you plugged your Bluetooth module into the shield’s pins:
+
+It likely is not getting power
+
+That’s why there’s no LED / no response
+
+✅ Correct way (IMPORTANT)
+Even if the Bluetooth is logically connected to the shield, it must be powered from the Arduino
+
+🔌 Proper wiring:
+Bluetooth VCC → Arduino 5V
+
+Bluetooth GND → Arduino GND
+
+Bluetooth TX → Arduino RX (pin 0 or 10 depending on setup)
+
+Bluetooth RX → Arduino TX (pin 1 or 9)
+
+⚠️ Why the shield won’t work for power
+The shield passes motor voltage (which can be unstable)
+
+It doesn’t regulate clean 5V for logic devices
+
+Some pins on the shield are just pass-through or not powered
+
+🔍 Quick test (do this now)
+Forget everything else for a moment:
+
+Plug Arduino into USB
+
+Connect ONLY:
+
+VCC → 5V
+
+GND → GND
+
+Leave TX/RX disconnected for now
+
+👉 Does the Bluetooth LED turn on?
+
+✅ YES → wiring issue with signal pins
+
+❌ NO → power wiring problem or module issue
+
+💡 Important detail about your setup
+Since you're using:
+
+Motor shield
+
+9V batteries
+
+👉 The Arduino 5V rail is the only reliable place for Bluetooth power
+
+🚨 Common mistake (what likely happened)
+You probably did something like:
+
+Connected VCC to a shield pin thinking it's 5V
+
+But:
+
+That pin is either not powered
+
+Or tied to motor voltage (unstable)
+
+🧠 Simple rule
+Motors → shield
+
+Sensors/modules (Bluetooth, etc.) → Arduino
+
+If you want, send me a quick picture of how you connected it—I can point out the exact mistake instantly.
+
+
+the shield has worked before stop larping
+
+Fair enough—you’re right to push back. If it worked before, then the shield can power it in your setup. Let’s stay practical and figure out why it’s not turning on now.
+
+At this point, ignore code completely. This is 100% a power issue.
+
+🔍 Let’s isolate the problem quickly
+Step 1 — Does the module power at all?
+Disconnect everything except:
+
+VCC
+
+GND
+
+Power your system.
+
+👉 Do you see any LED on the Bluetooth module?
+
+No LED at all → power problem
+
+LED blinking → power is fine, issue is TX/RX later
+
+🔧 Likely causes (based on your setup)
+1. Your 9V battery setup
+Even if the shield worked before:
+
+9V batteries drop voltage fast under load
+
+If motors are connected, they may be pulling voltage down
+
+The Bluetooth module may not get enough voltage to turn on
+
+👉 Try this:
+
+Disconnect motors
+
+Power everything again
+
+If the LED suddenly turns on → battery is the issue
+
+2. Wrong pin on the shield
+Even if it worked before, you might now be on a different pin.
+
+Make sure you're using:
+
+A 5V pin (or labeled VCC pin) on the shield
+
+Not motor power terminals
+
+3. Loose / bad connection
+This happens more than people expect:
+
+Jumper slightly out
+
+Breadboard rail not connected
+
+Ground not shared properly
+
+4. Arduino not actually powered properly
+Check:
+
+Is the Arduino ON? (power LED on?)
+
+If Arduino isn’t getting stable power → Bluetooth won’t either
+
+🔥 Fastest way to debug (no guessing)
+Do this exact test:
+
+Plug Arduino into USB
+
+Connect Bluetooth:
+
+VCC → Arduino 5V
+
+GND → Arduino GND
+
+👉 If it still doesn’t turn on:
+
+Module or wiring is bad
+
+👉 If it turns on:
+
+Your battery/shield power path is the problem
+
+🧠 Reality of your setup
+With:
+
+9V batteries
+
+4 DC motors
+
+You’re right on the edge of:
+
+voltage drop
+
+brownouts
+
+So even if it worked before, small changes can make it stop powering properly.
+
+If you want, send a picture of:
+
+where VCC is plugged on the shield
+
+your battery wiring
+
+I’ll pinpoint the exact issue instead of guessing.
+
+
+do you know the wiring for the shield?
+
+Yes—I know the shield you’re using. You’re working with the Adafruit Motor Shield v1 (L293D), and the wiring is very specific, especially for power.
+
+Let me show you the correct, real layout so there’s no confusion.
+
+🔌 Power wiring on the motor shield
+
+https://miro.medium.com/v2/resize%3Afit%3A1400/1%2AteQBeB6FeQS5ixv5s92NRg.png
+
+https://europe1.discourse-cdn.com/arduino/original/4X/a/3/f/a3f1006a2c1e7a405b6ffbcf7d6a383618d0d533.jpeg
+
+https://i.sstatic.net/darsZ.jpg
+4
+There are 3 important power areas:
+1. 🔋 EXT_PWR (screw terminal)
+This is where your motor battery goes:
+
+→ 9V battery positive
+
+– → 9V battery ground
+
+👉 This powers:
+
+motors
+
+part of the shield
+
+2. 🟡 Jumper (VERY important)
+If jumper is ON → Arduino is powered from motor battery
+
+If jumper is OFF → separate power
+
+👉 For your setup:
+
+You can leave it ON (since you're using 9V anyway)
+
+3. ⚡ 5V pin on the shield
+This is the one you need for Bluetooth:
+
+This is connected to Arduino’s 5V regulator
+
+This is where your Bluetooth VCC should go
+
+✅ Correct Bluetooth wiring (using the shield)
+VCC → 5V pin on shield
+
+GND → GND pin on shield
+
+TX → Arduino RX (pin 0 or your serial pin)
+
+RX → Arduino TX (pin 1 or your serial pin)
+
+👉 The shield just passes these pins through from the Arduino
+
+🚨 What probably went wrong
+Since it worked before, one of these likely happened:
+
+You plugged VCC into EXT_PWR by accident
+
+You used a motor terminal instead of 5V
+
+Your 9V battery dropped voltage under load
+
+Jumper changed position
+
+Ground not shared properly
+
+🔍 Quick test (no guessing)
+Do this:
+
+Remove motors temporarily
+
+Power the shield
+
+Connect:
+
+VCC → 5V pin (not EXT_PWR)
+
+GND → GND
+
+👉 If LED turns on → power path is correct
+👉 If not → wrong pin or weak battery
+
+🧠 Key idea (this is the whole system)
+EXT_PWR = raw battery (unregulated)
+
+5V pin = safe logic power (what Bluetooth needs)
+
+If you want, send a picture of where you plugged VCC—I’ll tell you instantly if it’s the wrong spot.
+
+
+I am going to put them in the servo ports
+
+That actually makes sense—and yes, you can use the servo ports on the Adafruit Motor Shield v1 (L293D) for power.
+
+But there are a couple important details so it works correctly.
+
+🔌 Servo port layout (what you’re plugging into)
+
+https://content.instructables.com/FQI/W0BK/LZ702FGT/FQIW0BKLZ702FGT.jpg
+
+https://europe1.discourse-cdn.com/arduino/optimized/4X/7/0/a/70a7050be3b83b5424af94e7cc70b49c061fd6ce_2_1024x347.png
+
+https://europe1.discourse-cdn.com/arduino/original/4X/9/2/9/92986fcfe5fdb35c96189cb8ed95f61cc8ebfe20.jpeg
+4
+Each servo port has 3 pins:
+
+Top → Signal
+
+Middle → 5V
+
+Bottom → GND
+
+✅ How to connect Bluetooth there
+If you're using the servo port:
+
+Bluetooth VCC → middle pin (5V)
+
+Bluetooth GND → bottom pin (GND)
+
+Bluetooth TX → Arduino RX (pin 0 or your serial pin)
+
+Bluetooth RX → Arduino TX (pin 1 or your serial pin)
+
+👉 The servo port is basically just a convenient way to access 5V and GND, so this is valid.
+
+⚠️ Why it might still not turn on
+If you plugged it there and no LED, check these:
+
+1. Orientation (VERY common issue)
+If you flip it:
+
+VCC might go to signal ❌
+
+GND might go to 5V ❌
+
+👉 Double-check:
+
+Middle = VCC
+
+Bottom = GND
+
+2. Is the Arduino actually powered?
+Servo pins only work if:
+
+Arduino is ON
+
+5V regulator is active
+
+👉 If you're using a weak 9V battery:
+
+The 5V line might not be stable → Bluetooth won’t turn on
+
+3. Jumper situation
+If you're powering through EXT_PWR:
+
+Make sure jumper is ON if you expect Arduino 5V to be active
+
+4. Battery issue (very likely in your case)
+With:
+
+9V battery
+
+motors connected
+
+👉 Voltage may drop → 5V rail dies → Bluetooth looks “off”
+
+🔍 Fast test (this will tell you instantly)
+Do this:
+
+Plug Arduino into USB
+
+Use servo pins:
+
+Middle → VCC
+
+Bottom → GND
+
+👉 If Bluetooth LED turns on:
+
+Your wiring is correct
+
+Your battery setup is the problem
+
+🧠 Bottom line
+✔ Servo ports = OK to use
+⚠️ Only if:
+
+You plug into the correct pins
+
+Arduino has stable power
+
+If you want, tell me:
+
+what Bluetooth module (HC-05 or HM-10)
+
+and I can give you exact pin orientation so you don’t guess at all.
+
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+
+  Serial.println("Bluetooth Test Ready");
+}
+
+void loop() {
+  // From phone → Arduino
+  if (BT.available()) {
+    char c = BT.read();
+    Serial.print("Received: ");
+    Serial.println(c);
+  }
+
+  // From Arduino → phone
+  if (Serial.available()) {
+    char c = Serial.read();
+    BT.write(c);
+  }
+}can you give me a test to see which pins they are 
+
+Good thinking—this is exactly how you debug it instead of guessing.
+
+What you want is a pin-finding test, so you can confirm:
+
+which wire is TX
+
+which is RX
+
+and that your SoftwareSerial pins are correct
+
+✅ Step-by-step pin test (simple and reliable)
+🔧 Use THIS test code
+#include <SoftwareSerial.h>
+
+// Try different pins here
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+
+  Serial.println("Type something in Serial Monitor...");
+}
+
+void loop() {
+  if (Serial.available()) {
+    char c = Serial.read();
+    BT.write(c); // send to Bluetooth
+  }
+}
+📱 What you do
+Open Serial Monitor (9600 baud)
+
+Connect your phone to Bluetooth
+
+Open a Bluetooth terminal app
+
+Type something in Serial Monitor
+
+🔍 What you’re looking for
+If wiring is CORRECT:
+👉 What you type in Serial Monitor shows up on your phone
+
+🔁 If it doesn’t work
+Now we systematically find the correct pins:
+
+🔄 Step 1: Swap wires
+Swap Bluetooth TX and RX wires
+
+Test again.
+
+🔄 Step 2: Try different Arduino pins
+Change this line:
+
+SoftwareSerial BT(10, 9);
+Try:
+
+(9, 10)
+
+(2, 3)
+
+(3, 2)
+
+Upload each time and test.
+
+🧠 How to know TX vs RX (important)
+Bluetooth TX → Arduino RX (first number)
+
+Bluetooth RX → Arduino TX (second number)
+
+So:
+
+SoftwareSerial BT(10, 9);
+// 10 = Arduino RX (connect to BT TX)
+// 9  = Arduino TX (connect to BT RX)
+🚨 Pro trick (fastest method)
+Instead of guessing everything:
+
+Do THIS:
+Leave code as:
+
+SoftwareSerial BT(10, 9);
+Connect ONLY:
+
+BT TX → pin 10
+
+leave BT RX disconnected
+
+👉 Now test:
+
+If you see incoming data → TX is correct
+
+Then connect RX afterward.
+
+⚠️ One more important thing
+If you're using servo ports:
+
+Make sure you didn’t accidentally plug into the signal pin
+
+You only want 5V and GND
+
+💡 What success looks like
+You type A in Serial Monitor
+
+It shows up instantly on your phone
+
+That means:
+✔ Pins are correct
+✔ Baud rate is correct
+✔ Module is working
+
+If you want, tell me:
+
+your Bluetooth module (HC-05 or HM-10)
+
+which pins you currently used
+
+I can pinpoint the exact combo so you don’t have to brute-force it.
+
+
+up to how many pins should I try 
+
+You don’t need to try a lot—limit it to a small, smart set and you’ll find it quickly.
+
+✅ Best pins to try (Uno)
+Stick to these known good SoftwareSerial pins:
+
+(10, 9) ← best (you already used this)
+
+(9, 10)
+
+(2, 3)
+
+(3, 2)
+
+(4, 5) (backup option)
+
+👉 That’s 5 combinations max
+You should NOT need more than this.
+
+❌ Pins to avoid
+Don’t waste time trying:
+
+0 & 1 → used by USB (causes conflicts)
+
+13 → tied to LED
+
+Analog pins (A0–A5) for now (can work, but unnecessary complexity)
+
+🔥 Fast strategy (don’t brute force blindly)
+Instead of trying everything randomly:
+
+Step 1 — lock this in:
+SoftwareSerial BT(10, 9);
+Step 2 — test wiring FIRST
+BT TX → pin 10
+
+BT RX → pin 9
+
+If no response:
+👉 swap the wires once (this is the #1 fix)
+
+🧠 Important reality check
+If none of these 4–5 combos work, the problem is NOT the pins.
+
+It’s usually:
+
+Bluetooth not powered correctly
+
+Wrong baud rate
+
+RX/TX flipped
+
+Weak 9V battery
+
+Bad connection
+
+💡 What I’d do in your exact situation
+Don’t try more than:
+👉 (10,9), (9,10), (2,3)
+
+If those don’t work:
+➡️ Stop and check wiring/power instead
+
+If you want, send me:
+
+how you connected TX/RX
+
+which module you have
+
+I can tell you the exact fix without trial and error.
+
+
+can you give me a way to find the fins without brutforcing
+
+Yes. You can find them without brute forcing.
+
+What you want is to identify:
+
+the power pins
+
+the TX pin
+
+the RX pin
+
+The cleanest way is this:
+
+1. Find power first
+With the module disconnected from signal wires:
+
+find the pins labeled on the board itself if possible: VCC, GND, TXD, RXD
+
+if there are no labels, look closely for tiny print on the PCB
+
+Usually Bluetooth modules have 4 pins:
+
+VCC
+
+GND
+
+TXD
+
+RXD
+
+If the module turns on when connected, you already found VCC and GND.
+
+2. Find TX without guessing many Arduino pins
+Use one known SoftwareSerial setup and test only the module wire.
+
+Code
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // Arduino RX, Arduino TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Serial.println("Listening for Bluetooth...");
+}
+
+void loop() {
+  if (BT.available()) {
+    char c = BT.read();
+    Serial.print("Got: ");
+    Serial.println(c);
+  }
+}
+Wiring for this test
+module power connected normally
+
+take one candidate signal pin from the Bluetooth module
+
+connect that candidate pin to Arduino pin 10
+
+Then send text from your phone.
+
+What happens:
+If text appears in Serial Monitor, that module pin is TX
+
+If nothing appears, that pin is not TX
+
+Because:
+
+Arduino pin 10 in SoftwareSerial BT(10,9) is the Arduino’s RX
+
+RX listens to the module’s TX
+
+So this finds TX directly.
+
+3. Then RX is the other signal pin
+Once you know which module pin is TX, the remaining signal pin is RX.
+
+Then wire:
+
+module TX → Arduino pin 10
+
+module RX → Arduino pin 9
+
+Now use this code:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // Arduino RX, Arduino TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Serial.println("Bluetooth test ready");
+}
+
+void loop() {
+  if (BT.available()) {
+    char c = BT.read();
+    Serial.print("From phone: ");
+    Serial.println(c);
+  }
+
+  if (Serial.available()) {
+    char c = Serial.read();
+    BT.write(c);
+  }
+}
+If you type in Serial Monitor, it should go to the phone too.
+
+4. Even easier rule
+If your module has only 4 pins and two are already power, then:
+
+one signal pin is TX
+
+the other is RX
+
+So you do not need to test many Arduino pins.
+
+You only need to:
+
+pick one Arduino SoftwareSerial pair, like 10 and 9
+
+determine which module signal pin can send data into Arduino pin 10
+
+That’s it.
+
+5. Fastest practical method
+Use this exact approach:
+
+keep Arduino pins fixed at 10 and 9
+
+identify the two signal pins on the module
+
+connect one candidate signal pin to 10
+
+send data from phone
+
+if Serial Monitor receives characters, that pin is TX
+
+the remaining signal pin is RX
+
+So really you only test 2 possibilities, not tons of pins.
+
+6. Important note
+For many Bluetooth modules:
+
+TX from module can go straight to Arduino RX
+
+RX on module should ideally get reduced voltage from Arduino TX
+
+For a quick test it may still work directly, but protection is better.
+
+If you send a clear photo of the module front and pins, I can identify the pins from the board layout.
+
+
+okay I can send form the serial monitor it goes to the phone but if I type on the phone it doesnt print on the serial monitor
+
+That means Arduino → phone is working, but phone → Arduino is not.
+
+So the problem is almost certainly one of these:
+
+Bluetooth TX is not connected to the Arduino RX pin you set in SoftwareSerial
+
+RX/TX are reversed on that side
+
+wrong baud rate
+
+app is not actually sending line endings/characters the way you expect
+
+Since data does go to the phone, your module is powered and your Arduino TX → module RX path is at least working enough.
+
+What this tells us exactly
+With:
+
+SoftwareSerial BT(10, 9); // RX, TX
+that means:
+
+pin 10 is Arduino’s receive pin
+
+pin 9 is Arduino’s transmit pin
+
+So for phone-to-Arduino to work, you need:
+
+Bluetooth TX → Arduino pin 10
+
+If that is not true, you won’t see anything in Serial Monitor.
+
+Best next test
+Use this code:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Serial.println("Ready");
+}
+
+void loop() {
+  if (BT.available()) {
+    int c = BT.read();
+    Serial.print("Got: ");
+    Serial.println((char)c);
+  }
+}
+Then check this carefully:
+
+Wiring
+BT TX → Arduino pin 10
+
+BT RX → Arduino pin 9
+
+VCC → 5V
+
+GND → GND
+
+Most likely fix
+Since Serial Monitor text reaches the phone, I think you probably have:
+
+BT RX connected correctly enough
+
+but BT TX is on the wrong Arduino pin
+
+So first, do just this:
+
+Swap only the two signal wires
+move the Bluetooth TX wire to the other pin
+
+move the Bluetooth RX wire to the other pin
+
+Then test again.
+
+Another thing to try
+Some phone serial apps send text only when you press:
+
+Send
+
+or newline / CR / LF
+
+So type something simple like:
+
+A
+
+and press Send.
+
+Do not assume it transmits while typing.
+
+One-way test to confirm BT TX
+You can isolate just the incoming path:
+
+#include <SoftwareSerial.h>
+SoftwareSerial BT(10, 9);
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+}
+
+void loop() {
+  if (BT.available()) {
+    Serial.write(BT.read());
+  }
+}
+If nothing prints when you send from the phone, then:
+
+wrong BT TX wiring
+
+or wrong baud
+
+If wiring still seems right
+Try changing only the Bluetooth baud line to:
+
+BT.begin(38400);
+Some modules are not at 9600 depending on mode/module type.
+
+Try:
+
+9600
+
+38400
+
+Those are the main ones worth checking.
+
+What I think is happening
+Most likely:
+the module pin that sends data back to Arduino is not actually on pin 10.
+
+So your quickest fix is:
+
+Keep SoftwareSerial BT(10, 9);
+
+Make sure module TX goes to pin 10
+
+Make sure module RX goes to pin 9
+
+Press actual Send in the phone app
+
+If still nothing, try BT.begin(38400);
+
+Tell me which Bluetooth module it is and exactly where your two signal wires are connected now.
+
+
+Uploaded image
+
+Yes — that screenshot tells a lot.
+
+The random boxes and garbage in Serial Monitor mean the Arduino is receiving nonsense bytes. Usually that happens for one of these reasons:
+
+wrong baud rate
+
+RX pin is floating / not connected correctly
+
+TX/RX wires are on the wrong pins
+
+Bluetooth module is sending data at a different baud than 9600
+
+Since you already said:
+
+Serial Monitor → phone works
+
+phone → Serial Monitor does not work correctly
+
+the most likely issue is:
+
+Most likely problem
+Your Bluetooth TX line into Arduino pin 10 is either:
+
+not the real TX pin
+
+loose
+
+or the module baud is not 9600
+
+What the screenshot specifically suggests
+Your code is:
+
+SoftwareSerial BT(10, 9); // RX, TX
+So:
+
+Arduino pin 10 must connect to Bluetooth TX
+
+Arduino pin 9 must connect to Bluetooth RX
+
+If pin 10 is not getting clean serial data, you get exactly that garbage output.
+
+Do this exact test
+Use this code:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Serial.println("Ready");
+}
+
+void loop() {
+  if (BT.available()) {
+    char c = BT.read();
+    Serial.print("Got: ");
+    Serial.println(c);
+  }
+}
+Then do these checks in order:
+
+1. Verify wiring
+BT TX → Arduino pin 10
+
+BT RX → Arduino pin 9
+
+VCC → 5V
+
+GND → GND
+
+2. Try sending just one character from phone
+Send:
+
+A
+Not a full word first.
+
+3. Change the Bluetooth baud
+If still garbage, change only this line:
+
+BT.begin(38400);
+A lot of modules use 38400 in some modes.
+
+If that still fails, try:
+
+BT.begin(9600);
+BT.begin(38400);
+BT.begin(19200);
+One at a time, upload each version, and test again.
+
+Very important detail from your screenshot
+The repeated garbage appearing even before useful text suggests pin 10 may be floating or getting noisy input.
+
+That means:
+
+the wire to BT TX may be loose
+
+or that pin is not actually connected to the module’s TX
+
+or the module TX pin is not the pin you think it is
+
+Best non-bruteforce way now
+Since Arduino → phone works, keep that side as-is.
+
+Now focus only on the incoming side:
+
+Disconnect only the wire going to Arduino pin 10
+Then test again.
+
+If the garbage stops, that wire/path is the problem
+
+If garbage remains, pin 10 is floating or something else is connected wrong
+
+One more strong test
+Use this code:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9);
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+}
+
+void loop() {
+  if (BT.available()) {
+    int c = BT.read();
+    Serial.print(c);
+    Serial.print(" ");
+  }
+}
+If you send one A from the phone:
+
+correct result should be close to 65
+
+garbage numbers means wrong baud
+
+no output means wrong wiring
+
+My honest guess
+Most likely it is one of these two:
+
+BT TX is not really on Arduino pin 10
+
+module baud is not 9600
+
+Start with those before changing anything else.
+
+Also, from your screenshot, your Serial Monitor is set to New Line. Some phone apps send extra CR/LF too, so test with a single letter first.
+
+Send me which Bluetooth module you have or a photo of the module pins, and I’ll tell you which pin is TX and which is RX.
+
+
+okay so I got the bluetooth connector to blink it has a slow blink while being not ocnnected
+
+That’s a good sign.
+
+A slow blink usually means the module has power and is waiting or advertising, but not actively connected yet. The exact blink pattern depends on the module model, but in general:
+
+blinking = powered on
+
+steady or different blink after pairing = connected
+
+So right now, your power wiring is probably okay.
+
+Next check
+Try pairing your phone to it again and watch the LED:
+
+if the blink changes when you connect, the Bluetooth link is working
+
+if it stays the same, the phone may not actually be connecting
+
+Then test data, not just connection
+Use this code:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Serial.println("Ready");
+}
+
+void loop() {
+  if (BT.available()) {
+    char c = BT.read();
+    Serial.print("Got: ");
+    Serial.println(c);
+  }
+}
+And make sure:
+
+BT TX -> Arduino pin 10
+
+BT RX -> Arduino pin 9
+
+VCC -> 5V
+
+GND -> GND
+
+Then from the phone, send just:
+
+A
+and press Send.
+
+What you want to see
+In Serial Monitor:
+
+Got: A
+If it still doesn’t print right
+Then the next most likely issue is baud rate. Try changing only this line:
+
+BT.begin(38400);
+If 9600 doesn’t work.
+
+Important distinction
+There are two separate things:
+
+module powered and blinking
+
+serial data actually working
+
+You’ve now likely fixed #1.
+Now we just need to verify #2.
+
+Tell me whether the blink changes when your phone connects.
+
+
+is there any way I can check what pins are the servo pins of the shield by doing some kind of test
+
+Yes—there is a clean way to verify the servo pins without guessing or trusting labels. You can test both power pins (5V/GND) and the signal pin.
+
+I’ll give you two quick tests.
+
+✅ Test 1 — Find 5V and GND (most important)
+🔧 Use a multimeter (best way)
+If you have one:
+
+Power the Arduino (USB is best)
+
+Put multimeter on DC voltage
+
+Measure between pins on the servo header
+
+👉 You should find:
+
+~5V between middle pin and GND
+
+0V between GND and GND
+
+That confirms:
+
+Middle = 5V
+
+One side = GND
+
+⚡ No multimeter? Use your Bluetooth module
+This works surprisingly well:
+
+Plug Bluetooth VCC into one pin
+
+Plug GND into another
+
+Power Arduino
+
+👉 If LED turns on:
+
+You found 5V + GND
+
+👉 If not:
+
+Try another combination
+
+You only need 2–3 tries max, not brute force.
+
+✅ Test 2 — Find the signal pin
+Once power is confirmed, the remaining pin is the signal pin.
+
+To verify:
+
+Code:
+#include <Servo.h>
+
+Servo testServo;
+
+void setup() {
+  testServo.attach(10); // use pin 10
+}
+
+void loop() {
+  testServo.write(0);
+  delay(1000);
+  testServo.write(90);
+  delay(1000);
+}
+Then:
+Connect servo signal wire to that pin
+
+If it moves → that pin is correct signal routing
+
+🧠 What the servo pins actually are on your shield
+On the Adafruit Motor Shield v1 (L293D):
+
+Servo pins are directly connected to:
+
+Pin 9
+
+Pin 10
+
+So:
+
+Servo 1 → pin 10
+
+Servo 2 → pin 9
+
+👉 That’s why your Bluetooth setup used (10, 9) — you were basically using those same pins.
+
+⚠️ Important catch (this matters for your issue)
+If you plug Bluetooth into servo headers:
+
+The signal pin is NOT TX/RX automatically
+
+It’s just connected to Arduino pins 9 or 10
+
+So you still need:
+
+TX → pin 10 (or 9 depending)
+
+RX → pin 9 (or 10)
+
+🔥 Fastest conclusion for your setup
+Middle pin = 5V
+
+Bottom pin = GND
+
+Top pin = signal (pin 9 or 10)
+
+💡 Quick sanity check
+If your Bluetooth LED turns on when plugged into servo pins:
+✔ Power pins are correct
+
+Then your only remaining problem is:
+➡️ TX/RX wiring or baud rate
+
+If you want, I can map exactly:
+
+which servo header is pin 9 vs pin 10
+
+and where your wires should go physically on the shield
+
+Just send a pic of how you plugged it in.
+
+
+okay the servo is spining
+
+Good—that’s actually a very strong confirmation.
+
+If the servo is spinning, then:
+
+✅ The servo header has correct 5V and GND
+
+✅ The signal pin is correctly mapped to Arduino pins (9 or 10)
+
+✅ Your shield is working properly
+
+So your hardware foundation is solid now.
+
+🧠 What this means for your Bluetooth
+Since:
+
+Servo works on those pins
+
+You’re using:
+
+SoftwareSerial BT(10, 9);
+👉 Then:
+
+One servo port = pin 10
+
+Other servo port = pin 9
+
+So now you know exactly where your Bluetooth should go
+
+✅ Final correct mapping (based on your test)
+Use the same pins that made the servo move
+
+Then wire Bluetooth like this:
+
+BT TX → the servo signal pin connected to Arduino RX (pin 10)
+
+BT RX → the other servo signal pin (pin 9)
+
+VCC → middle (5V)
+
+GND → bottom (GND)
+
+🔥 Now the key fix (based on your earlier issue)
+You had:
+
+phone → Arduino = not working
+
+garbage data
+
+That usually means:
+
+👉 TX line is wrong OR baud mismatch
+
+🎯 What to do right now (no guessing)
+Step 1 — Keep this:
+SoftwareSerial BT(10, 9);
+Step 2 — Try ONLY this change:
+Swap the signal wires:
+
+Swap where BT TX and BT RX are connected
+
+Step 3 — Test again
+Send:
+
+A
+From your phone.
+
+🔁 If still not working
+Try ONLY this change:
+
+BT.begin(38400);
+Then test again.
+
+🧠 Why this works
+You already proved:
+
+Pins are correct (servo test)
+
+Power is correct (LED blinking)
+
+So now the only remaining variables are:
+
+TX/RX direction
+
+baud rate
+
+💡 Where you are now
+You’re very close—this is the last 5% of debugging.
+
+Once:
+
+you see Got: A
+
+👉 your whole system (Bluetooth + Arduino + shield) is confirmed working.
+
+If you want, next step I can help you:
+
+plug this directly into your car code
+
+or fix it instantly if you send a pic of the Bluetooth wiring on the servo pins
+
+
+Uploaded image
+
+This screenshot is actually very helpful—you’re extremely close now.
+
+🔍 What your output means
+You’re getting:
+
+Got: □
+Got: □
+Got: □
+That means:
+
+✅ Arduino is receiving data (so TX → RX path is working now)
+
+❌ But the data is incorrect / corrupted
+
+👉 That is almost always a baud rate mismatch
+
+🎯 The fix (very likely)
+Change ONLY this line:
+
+BT.begin(9600);
+Try:
+BT.begin(38400);
+Upload and test again.
+
+🔁 If still wrong, try these (in order)
+BT.begin(38400);
+BT.begin(19200);
+BT.begin(115200);
+(Upload each time, test again)
+
+🧠 Why this is happening
+Bluetooth modules don’t always run at 9600:
+
+HC-05 normal mode → usually 9600
+
+HC-05 AT mode → 38400
+
+HM-10 → sometimes 9600, sometimes different
+
+When baud is wrong:
+
+Data arrives → but looks like garbage (your squares)
+
+⚠️ One more small improvement
+Change this line:
+
+Serial.println(c);
+to:
+
+Serial.println((int)c);
+Now you’ll see numbers like:
+
+Got: 65
+👉 If you send A, correct value is 65
+
+random numbers → wrong baud
+
+correct numbers → fixed
+
+💡 Where you are now
+You’ve already solved:
+
+✔ power
+
+✔ correct pins
+
+✔ TX/RX direction
+
+You’re literally at the last step: matching baud rate
+
+🔥 What should happen when fixed
+You send:
+
+A
+You see:
+
+Got: A
+or
+
+Got: 65
+If 38400 doesn’t fix it, tell me:
+
+what Bluetooth module it is (HC-05 or HM-10)
+
+I’ll give you the exact baud so you don’t keep guessing.
+
+
+Uploaded image
+here is the wiring for the servo pins how should I do it
+
+Perfect—that drawing helps a lot. You’ve basically drawn two servo headers:
+
+[ o   o   o ]   → Servo 1
+[ o   o   o ]   → Servo 2
+
+bottom row:
+[ - ]  [ + ]  [ S ]
+So each column is:
+
+– = GND
+
++ = 5V
+
+S = Signal
+
+✅ What you should do (exact wiring)
+Pick one servo row for power, and use the signal pins for data
+
+🔌 Power (same row)
+From either servo row:
+
+Bluetooth VCC → + (middle pin)
+
+Bluetooth GND → – (left pin)
+
+📡 Signal wiring (THIS is the important part)
+From your code:
+
+SoftwareSerial BT(10, 9); // RX, TX
+That means:
+
+Pin 10 = Arduino RX (goes to BT TX)
+
+Pin 9 = Arduino TX (goes to BT RX)
+
+🔥 Now map it to your drawing
+Use BOTH servo headers:
+Servo 1 (top row):
+Use its S pin → Arduino pin 10
+👉 Connect Bluetooth TX → this S pin
+
+Servo 2 (bottom row):
+Use its S pin → Arduino pin 9
+👉 Connect Bluetooth RX → this S pin
+
+🎯 Final wiring summary
+Bluetooth	Connect to
+VCC	+ (middle pin, any row)
+GND	– (left pin, any row)
+TX	S pin of servo 1 (pin 10)
+RX	S pin of servo 2 (pin 9)
+⚠️ One small correction from your drawing
+You labeled:
+
+-   +   S
+That’s correct orientation, but just make sure:
+
+you're not flipped upside down
+
+middle is truly 5V (you already confirmed with servo test 👍)
+
+🚨 Why your previous output was weird
+You had:
+
+Got: □
+That means:
+
+wiring is now correct ✅
+
+but baud rate is wrong
+
+🔧 FINAL STEP (don’t skip)
+Change this:
+
+BT.begin(9600);
+👉 to:
+
+BT.begin(38400);
+💡 What should happen now
+You send from phone:
+
+A
+You should see:
+
+Got: A
+If it still shows garbage after this, tell me:
+
+what the Bluetooth module looks like (or send pic)
+
+But honestly—you’re like one step away from it working fully.
+
+
+dodo I have to change this Serial.begin(9600);
+
+Good question—and this is where a lot of people get tripped up.
+
+✅ Short answer:
+No, you do NOT need to change Serial.begin(9600);
+
+🧠 Why
+You have two separate serial communications:
+
+1. USB (Arduino ↔ Serial Monitor)
+Serial.begin(9600);
+This is for your computer
+
+Keep this at 9600
+
+Your Serial Monitor is already set to 9600 → good
+
+2. Bluetooth (Arduino ↔ phone)
+BT.begin(...);
+This is for your Bluetooth module
+
+THIS is what you change
+
+🎯 What you should do
+Keep this:
+
+Serial.begin(9600);
+Only change this:
+
+BT.begin(38400);   // try this first
+⚠️ Important
+If you change Serial.begin, then:
+
+you must also change the Serial Monitor baud
+
+otherwise you’ll see garbage again
+
+💡 Quick mental model
+Serial = USB debugging
+
+BT = Bluetooth communication
+
+They are completely separate.
+
+✅ Final setup
+Serial.begin(9600);   // leave this
+BT.begin(38400);      // change this
+Once you do that, test again:
+
+Send:
+
+A
+You should see:
+
+Got: A
+If it still shows weird symbols after 38400, I’ll lock in the exact baud for your module next.
+
+
+Uploaded image
+
+Yes — the issue in that screenshot is that your Serial Monitor is set to 38400, but your code has:
+
+Serial.begin(9600);
+So the monitor is reading the Arduino at the wrong speed, which is why you see garbage.
+
+Fix this
+Leave your code as:
+
+Serial.begin(9600);
+BT.begin(38400);
+But change the Serial Monitor back to:
+
+9600 baud
+
+Why
+These are separate:
+
+Serial.begin(9600); → Arduino to computer
+
+BT.begin(38400); → Arduino to Bluetooth module
+
+So the monitor must match Serial, not BT.
+
+Also important from your screenshot
+You changed to:
+
+SoftwareSerial BT(9, 10); // RX, TX
+That means now the wiring must be:
+
+BT TX → Arduino pin 9
+
+BT RX → Arduino pin 10
+
+If your wires are still on the old arrangement, it will not work right.
+
+What to do right now
+Set Serial Monitor to 9600
+
+Keep:
+
+Serial.begin(9600);
+BT.begin(38400);
+Make sure wiring matches:
+
+SoftwareSerial BT(9, 10);
+so:
+
+Bluetooth TX → 9
+
+Bluetooth RX → 10
+
+Best test code now
+Use this so you can see the exact byte value:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(9, 10); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(38400);
+  Serial.println("Ready");
+}
+
+void loop() {
+  if (BT.available()) {
+    int c = BT.read();
+    Serial.print("Got: ");
+    Serial.println(c);
+  }
+}
+If you send A from the phone, the correct result is:
+
+Got: 65
+If you want, I can give you one final “known-good” test sketch and the exact matching wiring for either BT(10, 9) or BT(9, 10).
+
+
+I am showing you the output is still wrong
+
+Yep — and the screenshot proves it. The output is still wrong.
+
+That means the problem is not the Serial Monitor setting anymore. It is one of these:
+
+wrong baud for the Bluetooth module
+
+wrong RX/TX wiring
+
+wrong module type / app mode
+
+Since you are now getting some data, the module is alive. It’s just not being decoded correctly.
+
+Do this exact test next
+Use this code exactly:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Serial.println("Ready");
+}
+
+void loop() {
+  if (BT.available()) {
+    int c = BT.read();
+    Serial.print("Got number: ");
+    Serial.println(c);
+  }
+}
+Set Serial Monitor to:
+
+9600 baud
+
+And wire it as:
+
+Bluetooth TX -> pin 10
+
+Bluetooth RX -> pin 9
+
+VCC -> +
+
+GND -> -
+
+Then test in this order
+Send just one character from the phone:
+
+A
+
+If it does not print correctly, do not change anything except this line:
+
+BT.begin(38400);
+Test again.
+
+Then if still wrong, try:
+
+BT.begin(19200);
+Then:
+
+BT.begin(115200);
+Why I want println(c) as a number
+Because if you send A, the correct byte is:
+
+65
+
+So if you see:
+
+65 → fixed
+
+random values → wrong baud
+
+nothing → wiring issue
+
+Important reset
+Right now, stop swapping both code and wiring at the same time.
+
+Pick one setup and hold it fixed:
+
+Fixed setup
+SoftwareSerial BT(10, 9); // RX, TX
+Fixed wiring
+BT TX -> 10
+
+BT RX -> 9
+
+Then only change BT.begin(...).
+
+One more important possibility
+If your module is HM-10, some phone apps connect to it as BLE, but the serial data app may not be the right kind of app.
+If it is HC-05, regular Bluetooth serial apps usually work.
+
+So the next useful thing is: send a photo of the Bluetooth module itself. Then I can tell you whether it’s HC-05, HC-06, or HM-10, and that will narrow the baud and app issue fast.
+
+
+my module is hm-10
+
+That changes a lot.
+
+An HM-10 is BLE, not classic Bluetooth like an HC-05. So the most likely problem is now:
+
+The real issue
+You’re probably using the wrong kind of phone app, not the wrong Arduino code.
+
+A lot of “Bluetooth terminal” apps are made for:
+
+HC-05 / HC-06
+
+classic Bluetooth serial
+
+But HM-10 needs a BLE UART / BLE terminal app.
+
+What this means for your setup
+For an HM-10, this is usually correct:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);   // HM-10 is usually 9600
+  Serial.println("Ready");
+}
+
+void loop() {
+  if (BT.available()) {
+    int c = BT.read();
+    Serial.print("Got number: ");
+    Serial.println(c);
+  }
+}
+And wiring:
+
+HM-10 TX → Arduino pin 10
+
+HM-10 RX → Arduino pin 9
+
+VCC → 5V
+
+GND → GND
+
+So for HM-10, go back to:
+
+BT.begin(9600);
+
+Serial Monitor at 9600
+
+Why you were getting weird output
+Because with HM-10, if the app is not doing proper BLE UART communication, you can get:
+
+no useful text
+
+weird characters
+
+partial garbage
+
+connection without real serial behavior
+
+What you should do now
+1. Use a BLE terminal app
+Look for an app described like:
+
+BLE Terminal
+
+BLE UART
+
+HM-10 terminal
+
+Bluetooth LE terminal
+
+Not just generic “Bluetooth terminal.”
+
+2. Use this fixed setup
+Keep it fixed:
+
+SoftwareSerial BT(10, 9); // RX, TX
+BT.begin(9600);
+Serial.begin(9600);
+And:
+
+HM-10 TX → 10
+
+HM-10 RX → 9
+
+3. Test with single characters
+Send just:
+
+A
+Then check Serial Monitor for:
+
+Got number: 65
+Very important note
+Some HM-10 apps show that you are “connected,” but they are not actually sending data through the right BLE characteristic. So connection alone does not prove serial is working.
+
+Best next step
+At this point, I would stop changing baud rates and pin combos.
+
+Use:
+
+HM-10
+
+9600
+
+SoftwareSerial BT(10, 9)
+
+a BLE UART app
+
+That is the right direction.
+
+If you want, I can give you a known-good HM-10 test sketch that sends text both ways and a checklist for what the BLE app should show.
+
+
+since this is a ble can I just make a simple local website to control it through my computer
+
+
+Thought for 8s
+Yes — you can make a simple local website and use it to control an HM-10 from your computer with Web Bluetooth, as long as you use a supported browser. The Web Bluetooth API is supported in Chrome and Edge, but not Firefox, and it’s considered limited-availability overall. 
+
+A few practical limits matter:
+
+Your Arduino sketch still needs to talk to the HM-10 over serial at the HM-10’s baud rate, which is commonly 9600 in normal use. If that serial side is wrong, the website will not fix it.
+
+The website must be opened in a secure context. In practice, that means https: or a local context that the browser treats as secure, such as localhost. Web Bluetooth device access is requested through navigator.bluetooth.requestDevice(...). 
+
+So the overall idea is:
+
+Arduino ↔ HM-10 over serial
+
+Chrome/Edge webpage ↔ HM-10 over BLE
+
+Buttons on the page send characters like F, B, L, R, X
+
+For your car, that can be a really nice setup because it avoids needing a phone terminal app at all.
+
+Your Arduino side can stay simple, like this idea:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+}
+
+void loop() {
+  if (BT.available()) {
+    char c = BT.read();
+
+    // use c for car commands
+    // F, B, L, R, X
+  }
+}
+And the webpage can have buttons that write those characters to the HM-10’s writable BLE characteristic.
+
+One important catch: with BLE, the page needs the correct service UUID and characteristic UUID that your HM-10 exposes. Some HM-10 firmware variants use the common UART-style service/characteristic pair:
+
+service: 0000ffe0-0000-1000-8000-00805f9b34fb
+
+characteristic: 0000ffe1-0000-1000-8000-00805f9b34fb
+
+But clones and different firmware versions can vary, so if those do not work, you may need to inspect the device’s exposed services. That part is the main uncertainty.
+
+Here’s a minimal local page you can try in Chrome or Edge:
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>HM-10 Car Control</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    button { width: 90px; height: 50px; margin: 8px; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <h2>HM-10 Car Control</h2>
+  <button onclick="connect()">Connect</button>
+  <div style="margin-top:16px;">
+    <button onclick="sendCmd('F')">Forward</button><br>
+    <button onclick="sendCmd('L')">Left</button>
+    <button onclick="sendCmd('X')">Stop</button>
+    <button onclick="sendCmd('R')">Right</button><br>
+    <button onclick="sendCmd('B')">Back</button>
+  </div>
+
+  <script>
+    let characteristic;
+
+    async function connect() {
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [{ namePrefix: 'HM' }],
+        optionalServices: ['0000ffe0-0000-1000-8000-00805f9b34fb']
+      });
+
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
+      characteristic = await service.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
+
+      alert('Connected to ' + (device.name || 'device'));
+    }
+
+    async function sendCmd(cmd) {
+      if (!characteristic) {
+        alert('Connect first');
+        return;
+      }
+      const data = new TextEncoder().encode(cmd);
+      await characteristic.writeValue(data);
+    }
+  </script>
+</body>
+</html>
+How to run it:
+
+save it as index.html
+
+open it from a local server, ideally on localhost
+
+use Chrome or Edge
+
+click Connect
+
+choose the HM-10
+
+try the buttons
+
+If you want the smoothest path, I’d suggest this order:
+
+first confirm the HM-10 is readable from Arduino with a very basic serial sketch
+
+then try the webpage
+
+then hook the commands into your motor code
+
+I can give you a complete pair next: a tested Arduino sketch for F/B/L/R/X and a matching local webpage for the HM-10.
+
+
+okay perfect now can we do like a control where the car is controlled by wasd 
+
+Yes — that’s a good setup.
+
+You can make it work like this:
+
+W → forward
+
+A → left
+
+S → backward
+
+D → right
+
+when the key is released → send X for stop
+
+That gives you keyboard control from your computer through the HM-10.
+
+Local webpage
+Save this as index.html:
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>BLE Car Control</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 40px;
+    }
+    button {
+      width: 120px;
+      height: 50px;
+      font-size: 18px;
+      margin: 8px;
+    }
+    #status {
+      margin: 20px;
+      font-size: 18px;
+    }
+    .keybox {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>HM-10 Car Control</h1>
+  <button onclick="connectBLE()">Connect</button>
+  <div id="status">Not connected</div>
+  <div class="keybox">Use W A S D to drive</div>
+
+  <script>
+    let characteristic = null;
+    let lastCommand = "";
+
+    async function connectBLE() {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ namePrefix: "HM" }],
+          optionalServices: ["0000ffe0-0000-1000-8000-00805f9b34fb"]
+        });
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService("0000ffe0-0000-1000-8000-00805f9b34fb");
+        characteristic = await service.getCharacteristic("0000ffe1-0000-1000-8000-00805f9b34fb");
+
+        document.getElementById("status").innerText = "Connected to " + (device.name || "HM-10");
+      } catch (error) {
+        document.getElementById("status").innerText = "Connection failed";
+        console.error(error);
+      }
+    }
+
+    async function sendCommand(cmd) {
+      if (!characteristic) return;
+      if (cmd === lastCommand) return;
+
+      try {
+        const data = new TextEncoder().encode(cmd);
+        await characteristic.writeValue(data);
+        lastCommand = cmd;
+        console.log("Sent:", cmd);
+      } catch (error) {
+        console.error("Send failed:", error);
+      }
+    }
+
+    document.addEventListener("keydown", async (event) => {
+      const key = event.key.toLowerCase();
+
+      if (key === "w") await sendCommand("F");
+      else if (key === "a") await sendCommand("L");
+      else if (key === "s") await sendCommand("B");
+      else if (key === "d") await sendCommand("R");
+    });
+
+    document.addEventListener("keyup", async (event) => {
+      const key = event.key.toLowerCase();
+
+      if (["w", "a", "s", "d"].includes(key)) {
+        await sendCommand("X");
+        lastCommand = "";
+      }
+    });
+  </script>
+</body>
+</html>
+Arduino code
+Use this on the Arduino side:
+
+#include <AFMotor.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+AF_DCMotor motor1(1);
+AF_DCMotor motor2(2);
+AF_DCMotor motor3(3);
+AF_DCMotor motor4(4);
+
+int speedVal = 150;
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+
+  motor1.setSpeed(speedVal);
+  motor2.setSpeed(speedVal);
+  motor3.setSpeed(speedVal);
+  motor4.setSpeed(speedVal);
+
+  stopMotors();
+}
+
+void loop() {
+  if (BT.available()) {
+    char command = BT.read();
+    Serial.println(command);
+
+    switch (command) {
+      case 'F':
+        forward();
+        break;
+      case 'B':
+        backward();
+        break;
+      case 'L':
+        left();
+        break;
+      case 'R':
+        right();
+        break;
+      case 'X':
+        stopMotors();
+        break;
+    }
+  }
+}
+
+void forward() {
+  motor1.run(FORWARD);
+  motor2.run(FORWARD);
+  motor3.run(FORWARD);
+  motor4.run(FORWARD);
+}
+
+void backward() {
+  motor1.run(BACKWARD);
+  motor2.run(BACKWARD);
+  motor3.run(BACKWARD);
+  motor4.run(BACKWARD);
+}
+
+void left() {
+  motor1.run(BACKWARD);
+  motor2.run(BACKWARD);
+  motor3.run(FORWARD);
+  motor4.run(FORWARD);
+}
+
+void right() {
+  motor1.run(FORWARD);
+  motor2.run(FORWARD);
+  motor3.run(BACKWARD);
+  motor4.run(BACKWARD);
+}
+
+void stopMotors() {
+  motor1.run(RELEASE);
+  motor2.run(RELEASE);
+  motor3.run(RELEASE);
+  motor4.run(RELEASE);
+}
+Important note
+Your HM-10 side should stay at:
+
+BT.begin(9600);
+And the wiring should still be:
+
+HM-10 TX → Arduino pin 10
+
+HM-10 RX → Arduino pin 9
+
+VCC → 5V
+
+GND → GND
+
+How it works
+press W → sends F
+
+press A → sends L
+
+press S → sends B
+
+press D → sends R
+
+release any of them → sends X
+
+If you want, I can make the next version support holding W+A together for forward-left and W+D for forward-right.
+
+
+Since I have not connected hes yet can you just print them
+
+Perfect—that’s actually the best way to test first before involving motors.
+
+Let’s simplify everything so it just prints what WASD is sending.
+
+✅ Use THIS Arduino test code
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Serial.println("Ready...");
+}
+
+void loop() {
+  if (BT.available()) {
+    char c = BT.read();
+    Serial.print("Received: ");
+    Serial.println(c);
+  }
+}
+✅ Use THIS webpage (WASD → print test)
+This version will still send commands, but you’ll just watch them in Serial Monitor.
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WASD Test</title>
+</head>
+<body>
+  <h2>WASD Test (Check Serial Monitor)</h2>
+  <button onclick="connectBLE()">Connect</button>
+
+  <script>
+    let characteristic;
+
+    async function connectBLE() {
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [{ namePrefix: "HM" }],
+        optionalServices: ["0000ffe0-0000-1000-8000-00805f9b34fb"]
+      });
+
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService("0000ffe0-0000-1000-8000-00805f9b34fb");
+      characteristic = await service.getCharacteristic("0000ffe1-0000-1000-8000-00805f9b34fb");
+
+      alert("Connected!");
+    }
+
+    async function send(cmd) {
+      if (!characteristic) return;
+      const data = new TextEncoder().encode(cmd);
+      await characteristic.writeValue(data);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      const key = e.key.toLowerCase();
+
+      if (key === "w") send("F");
+      if (key === "a") send("L");
+      if (key === "s") send("B");
+      if (key === "d") send("R");
+    });
+
+    document.addEventListener("keyup", (e) => {
+      if (["w","a","s","d"].includes(e.key.toLowerCase())) {
+        send("X");
+      }
+    });
+  </script>
+</body>
+</html>
+🔍 What you should see
+Open Serial Monitor (9600), then:
+
+Press keys:
+
+press W →
+
+Received: F
+press A →
+
+Received: L
+release →
+
+Received: X
+⚠️ Important setup reminders
+Use Chrome or Edge
+
+Open page from:
+
+http://localhost
+(or a local server, not just double-click file)
+
+Bluetooth wiring:
+
+HM-10 TX → pin 10
+
+HM-10 RX → pin 9
+
+💡 What this confirms
+If this works:
+✔ BLE connection is good
+✔ WASD input is working
+✔ Arduino is receiving correctly
+
+Then you’re ready to plug back into motors.
+
+If you want next step after this:
+I can make it smooth driving (no stop on every key release) or diagonal movement (W+A, W+D).
+
+
+make sure if I am clicking two button it wrties those two buttons since that will be like moving forward and turning
+
+That’s a smart upgrade—and it’s exactly how real controls should behave.
+
+Right now your setup sends one key at a time, but for driving you want:
+
+W + A → forward-left
+
+W + D → forward-right
+
+S + A → backward-left
+
+etc.
+
+So instead of sending single letters, we track which keys are currently held and send a combined command.
+
+✅ Updated Webpage (WASD with combinations)
+This version tracks multiple keys and sends combined commands like "FL", "FR", etc.
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WASD Multi-Key Control</title>
+</head>
+<body>
+  <h2>WASD Multi-Key Control</h2>
+  <button onclick="connectBLE()">Connect</button>
+
+  <script>
+    let characteristic;
+    let keys = new Set();
+
+    async function connectBLE() {
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [{ namePrefix: "HM" }],
+        optionalServices: ["0000ffe0-0000-1000-8000-00805f9b34fb"]
+      });
+
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService("0000ffe0-0000-1000-8000-00805f9b34fb");
+      characteristic = await service.getCharacteristic("0000ffe1-0000-1000-8000-00805f9b34fb");
+
+      alert("Connected!");
+    }
+
+    async function send(cmd) {
+      if (!characteristic) return;
+      const data = new TextEncoder().encode(cmd);
+      await characteristic.writeValue(data);
+      console.log("Sent:", cmd);
+    }
+
+    function updateCommand() {
+      let cmd = "";
+
+      if (keys.has("w")) cmd += "F";
+      if (keys.has("s")) cmd += "B";
+      if (keys.has("a")) cmd += "L";
+      if (keys.has("d")) cmd += "R";
+
+      if (cmd === "") cmd = "X"; // stop
+
+      send(cmd);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      const key = e.key.toLowerCase();
+      if (["w","a","s","d"].includes(key)) {
+        keys.add(key);
+        updateCommand();
+      }
+    });
+
+    document.addEventListener("keyup", (e) => {
+      const key = e.key.toLowerCase();
+      if (["w","a","s","d"].includes(key)) {
+        keys.delete(key);
+        updateCommand();
+      }
+    });
+  </script>
+</body>
+</html>
+🧪 What gets sent now
+Keys pressed	Sent
+W	F
+A	L
+W + A	FL
+W + D	FR
+S + A	BL
+none	X
+✅ Arduino test code (just print)
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9);
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+}
+
+void loop() {
+  if (BT.available()) {
+    String cmd = BT.readString();
+    Serial.print("Received: ");
+    Serial.println(cmd);
+  }
+}
+🔍 What you should see
+Press:
+
+W + A
+
+Received: FL
+Press:
+
+W + D
+
+Received: FR
+Release everything:
+
+Received: X
+⚠️ Important note
+readString() groups characters, so you’ll get full commands like "FL" instead of separate letters.
+
+💡 Next step (after this works)
+I can help you:
+
+map "FL" → smooth motor turning
+
+or make it analog-style turning (faster + slower wheels)
+
+But first make sure this prints correctly 👍
+
+
+is tehre a ffree way I can host this for my class
+
+Yes—there are really good free options, and your project is actually perfect for them because it’s just HTML + JavaScript (a static site).
+
+Let me give you the best options for your situation (class demo + BLE) 👇
+
+🥇 Best option: GitHub Pages (most reliable)
+Completely free
+
+Works great for HTML + JS projects
+
+Easy to share with your class via a link
+
+👉 You upload your files and it becomes:
+
+https://yourusername.github.io/
+✔ Built specifically for static sites 
+
+✔ No server needed
+✔ Very reliable and simple to maintain 
+
+🥈 Easiest option: Netlify (super beginner friendly)
+You can literally drag and drop your folder
+
+Instantly gives you a live link
+
+✔ Drag-and-drop deploy is supported 
+
+✔ Auto updates if you change files
+✔ Great for demos
+
+🥉 Also great: Vercel
+Similar to Netlify
+
+More “developer-style”
+
+Still free
+
+✔ Designed for frontend apps and static sites 
+
+🧠 IMPORTANT (for your BLE project)
+Because you're using Web Bluetooth, you MUST:
+
+Open the site on:
+
+https:// (hosted site) OR
+
+http://localhost
+
+👉 Good news:
+All these platforms give you HTTPS automatically, so BLE will work.
+
+🔥 What I recommend for YOU
+Since you’re:
+
+in a class
+
+doing a demo
+
+using HTML + JS only
+
+👉 Go with Netlify if you want fastest setup
+👉 Go with GitHub Pages if you want something more “official”/clean
+
+🚀 Fastest setup (literally 2 minutes)
+Netlify method:
+Go to Netlify
+
+Drag your project folder
+
+Done → you get a link instantly
+
+GitHub Pages method:
+Create GitHub account
+
+Upload your files
+
+Enable Pages
+
+Done
+
+💡 Bonus (for your presentation)
+If you show your professor:
+
+website
+
+WASD controls
+
+BLE connection
+
+👉 That’s a very strong project (hardware + software + web integration)
+
+⚠️ One small heads-up
+Some school laptops / browsers:
+
+may block Bluetooth permissions
+
+👉 Use:
+
+Chrome or Edge
+
+allow Bluetooth when prompted
+
+If you want, I can:
+
+walk you step-by-step to deploy it (literally in 2–3 minutes)
+
+or help you make the UI look cleaner for your class demo (buttons, animations, etc.)
+
+
+Uploaded image
+can you make it visually appealing and give instructions and other things
+
+Yes — here’s a cleaner version that looks much better for class and includes:
+
+a nicer layout
+
+connection status
+
+instructions on the page
+
+current keys being pressed
+
+current command being sent
+
+a small control legend
+
+Use this as your full index.html.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLE Car Control</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b, #0b1120);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.2rem;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: #cbd5e1;
+      font-size: 1rem;
+    }
+
+    .connect-btn {
+      background: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 22px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .connect-btn:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      margin-bottom: 14px;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: bold;
+      background: #7f1d1d;
+      color: #fecaca;
+      margin-bottom: 14px;
+    }
+
+    .status-pill.connected {
+      background: #14532d;
+      color: #bbf7d0;
+    }
+
+    .info-row {
+      margin: 12px 0;
+      font-size: 1rem;
+      color: #e2e8f0;
+    }
+
+    .highlight {
+      color: #38bdf8;
+      font-weight: bold;
+    }
+
+    .instructions {
+      line-height: 1.7;
+      color: #e2e8f0;
+    }
+
+    .instructions strong {
+      color: #ffffff;
+    }
+
+    .keys-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .key-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .key {
+      width: 72px;
+      height: 72px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 16px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.12s ease;
+      user-select: none;
+    }
+
+    .key.active {
+      background: #38bdf8;
+      color: #082f49;
+      border-color: #7dd3fc;
+      transform: scale(1.04);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+    }
+
+    .command-box {
+      margin-top: 18px;
+      text-align: center;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .command-label {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .command-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #f8fafc;
+      letter-spacing: 1px;
+    }
+
+    .legend {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      color: #e2e8f0;
+      font-size: 0.96rem;
+    }
+
+    .footer-note {
+      margin-top: 22px;
+      color: #94a3b8;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 800px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .key {
+        width: 64px;
+        height: 64px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <h1>BLE Car Control</h1>
+        <div class="subtitle">WASD keyboard control for HM-10 Bluetooth car</div>
+      </div>
+      <button class="connect-btn" onclick="connectBLE()">Connect Device</button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Connection & Instructions</h2>
+        <div id="status" class="status-pill">Not Connected</div>
+
+        <div class="info-row">Device: <span id="deviceName" class="highlight">None</span></div>
+        <div class="info-row">Keys Pressed: <span id="pressedKeys" class="highlight">None</span></div>
+
+        <div class="instructions">
+          <p><strong>How to use:</strong></p>
+          <p>1. Click <strong>Connect Device</strong>.</p>
+          <p>2. Select your HM-10 BLE module from the browser popup.</p>
+          <p>3. Use <strong>W, A, S, D</strong> on your keyboard to control the car.</p>
+          <p>4. You can hold <strong>two keys at once</strong> for combined movement like forward-left or forward-right.</p>
+          <p>5. Releasing all keys sends a stop command.</p>
+        </div>
+
+        <div class="footer-note">
+          Best used in Chrome or Edge with Bluetooth enabled.
+          Your HM-10 should already be powered and ready before connecting.
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Live Control Panel</h2>
+
+        <div class="keys-panel">
+          <div class="key-row">
+            <div id="key-w" class="key">W</div>
+          </div>
+          <div class="key-row">
+            <div id="key-a" class="key">A</div>
+            <div id="key-s" class="key">S</div>
+            <div id="key-d" class="key">D</div>
+          </div>
+        </div>
+
+        <div class="command-box">
+          <div class="command-label">Current Command</div>
+          <div id="commandValue" class="command-value">X</div>
+        </div>
+
+        <div class="legend">
+          <div><strong>W</strong> = Forward</div>
+          <div><strong>S</strong> = Backward</div>
+          <div><strong>A</strong> = Left</div>
+          <div><strong>D</strong> = Right</div>
+          <div><strong>W + A</strong> = Forward Left</div>
+          <div><strong>W + D</strong> = Forward Right</div>
+          <div><strong>S + A</strong> = Back Left</div>
+          <div><strong>S + D</strong> = Back Right</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let characteristic = null;
+    let pressed = new Set();
+    let lastSent = "";
+    let connectedDeviceName = "None";
+
+    const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
+    const CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+
+    function updateUICommand(cmd) {
+      document.getElementById("commandValue").textContent = cmd;
+    }
+
+    function updatePressedKeys() {
+      const keys = Array.from(pressed).map(k => k.toUpperCase()).join(", ");
+      document.getElementById("pressedKeys").textContent = keys || "None";
+
+      ["w", "a", "s", "d"].forEach(k => {
+        const el = document.getElementById(`key-${k}`);
+        if (pressed.has(k)) el.classList.add("active");
+        else el.classList.remove("active");
+      });
+    }
+
+    function buildCommand() {
+      const hasW = pressed.has("w");
+      const hasA = pressed.has("a");
+      const hasS = pressed.has("s");
+      const hasD = pressed.has("d");
+
+      let cmd = "";
+
+      if (hasW) cmd += "F";
+      if (hasS) cmd += "B";
+      if (hasA) cmd += "L";
+      if (hasD) cmd += "R";
+
+      if (cmd === "") cmd = "X";
+      return cmd;
+    }
+
+    async function sendCommand(cmd) {
+      updateUICommand(cmd);
+
+      if (!characteristic) return;
+      if (cmd === lastSent) return;
+
+      try {
+        const data = new TextEncoder().encode(cmd);
+        await characteristic.writeValue(data);
+        lastSent = cmd;
+      } catch (error) {
+        console.error("Send failed:", error);
+      }
+    }
+
+    async function updateAndSend() {
+      updatePressedKeys();
+      const cmd = buildCommand();
+      await sendCommand(cmd);
+    }
+
+    async function connectBLE() {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ namePrefix: "HM" }],
+          optionalServices: [SERVICE_UUID]
+        });
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService(SERVICE_UUID);
+        characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+
+        connectedDeviceName = device.name || "HM-10";
+        document.getElementById("deviceName").textContent = connectedDeviceName;
+
+        const status = document.getElementById("status");
+        status.textContent = "Connected";
+        status.classList.add("connected");
+      } catch (error) {
+        console.error(error);
+        alert("Connection failed. Make sure you're using Chrome/Edge and the HM-10 is powered on.");
+      }
+    }
+
+    document.addEventListener("keydown", async (e) => {
+      const key = e.key.toLowerCase();
+      if (!["w", "a", "s", "d"].includes(key)) return;
+
+      if (!pressed.has(key)) {
+        pressed.add(key);
+        await updateAndSend();
+      }
+    });
+
+    document.addEventListener("keyup", async (e) => {
+      const key = e.key.toLowerCase();
+      if (!["w", "a", "s", "d"].includes(key)) return;
+
+      if (pressed.has(key)) {
+        pressed.delete(key);
+        await updateAndSend();
+      }
+    });
+
+    updatePressedKeys();
+    updateUICommand("X");
+  </script>
+</body>
+</html>
+A couple of notes for your class demo:
+
+This page shows the current pressed keys and the command being sent, which makes it easier to explain during presentation.
+
+Combined commands will look like:
+
+FL for forward-left
+
+FR for forward-right
+
+BL for back-left
+
+BR for back-right
+
+When no key is pressed, it sends X.
+
+Your Arduino test code should print the incoming strings, not just one character, so use this:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Serial.println("Ready...");
+}
+
+void loop() {
+  if (BT.available()) {
+    String cmd = BT.readString();
+    cmd.trim();
+    if (cmd.length() > 0) {
+      Serial.print("Received: ");
+      Serial.println(cmd);
+    }
+  }
+}
+If you want, I can also make it look even more polished with a car icon, arrow buttons, and a “school project” style title section.
+
+
+okay now I have the motors connected 
+
+Nice — now do this in two steps so you don’t chase multiple problems at once.
+
+Step 1: confirm commands still arrive
+Keep the website as-is, and upload this quick motor test code that also prints what it receives:
+
+#include <AFMotor.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+AF_DCMotor motor1(1); // Front Left
+AF_DCMotor motor2(2); // Back Left
+AF_DCMotor motor3(3); // Back Right
+AF_DCMotor motor4(4); // Front Right
+
+int speedVal = 140;
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+
+  motor1.setSpeed(speedVal);
+  motor2.setSpeed(speedVal);
+  motor3.setSpeed(speedVal);
+  motor4.setSpeed(speedVal);
+
+  stopMotors();
+  Serial.println("Ready...");
+}
+
+void loop() {
+  if (BT.available()) {
+    String cmd = BT.readString();
+    cmd.trim();
+
+    if (cmd.length() > 0) {
+      Serial.print("Received: ");
+      Serial.println(cmd);
+      handleCommand(cmd);
+    }
+  }
+}
+
+void handleCommand(String cmd) {
+  if (cmd == "F") {
+    forward();
+  } else if (cmd == "B") {
+    backward();
+  } else if (cmd == "L") {
+    left();
+  } else if (cmd == "R") {
+    right();
+  } else if (cmd == "FL") {
+    forwardLeft();
+  } else if (cmd == "FR") {
+    forwardRight();
+  } else if (cmd == "BL") {
+    backLeft();
+  } else if (cmd == "BR") {
+    backRight();
+  } else if (cmd == "X") {
+    stopMotors();
+  }
+}
+
+void forward() {
+  motor1.run(FORWARD);
+  motor2.run(FORWARD);
+  motor3.run(FORWARD);
+  motor4.run(FORWARD);
+}
+
+void backward() {
+  motor1.run(BACKWARD);
+  motor2.run(BACKWARD);
+  motor3.run(BACKWARD);
+  motor4.run(BACKWARD);
+}
+
+void left() {
+  motor1.run(BACKWARD);
+  motor2.run(BACKWARD);
+  motor3.run(FORWARD);
+  motor4.run(FORWARD);
+}
+
+void right() {
+  motor1.run(FORWARD);
+  motor2.run(FORWARD);
+  motor3.run(BACKWARD);
+  motor4.run(BACKWARD);
+}
+
+void forwardLeft() {
+  motor1.run(RELEASE);
+  motor2.run(RELEASE);
+  motor3.run(FORWARD);
+  motor4.run(FORWARD);
+}
+
+void forwardRight() {
+  motor1.run(FORWARD);
+  motor2.run(FORWARD);
+  motor3.run(RELEASE);
+  motor4.run(RELEASE);
+}
+
+void backLeft() {
+  motor1.run(RELEASE);
+  motor2.run(RELEASE);
+  motor3.run(BACKWARD);
+  motor4.run(BACKWARD);
+}
+
+void backRight() {
+  motor1.run(BACKWARD);
+  motor2.run(BACKWARD);
+  motor3.run(RELEASE);
+  motor4.run(RELEASE);
+}
+
+void stopMotors() {
+  motor1.run(RELEASE);
+  motor2.run(RELEASE);
+  motor3.run(RELEASE);
+  motor4.run(RELEASE);
+}
+Step 2: test in this exact order
+Press these one at a time:
+
+W → car should go forward
+
+S → backward
+
+A → rotate left
+
+D → rotate right
+
+release all → stop
+
+Then test combos:
+
+W + A → forward-left
+
+W + D → forward-right
+
+S + A → back-left
+
+S + D → back-right
+
+If movement is wrong
+That is normal at first. You may need to flip some motor directions because the wiring/order of motors is often different.
+
+For example, if one side spins backward when it should go forward, change just that motor in forward() from:
+
+motor1.run(FORWARD);
+to:
+
+motor1.run(BACKWARD);
+Quick way to debug motor orientation
+Tell me what each key does physically:
+
+what happens on W
+
+what happens on A
+
+what happens on D
+
+and I’ll remap the code for your exact motor wiring.
+
+Important battery note
+Since you’re on 9V batteries, if:
+
+Bluetooth disconnects
+
+Arduino resets
+
+motors twitch but don’t run
+
+then power is likely sagging under load. In that case, reduce:
+
+int speedVal = 140;
+to:
+
+int speedVal = 100;
+Start there and see what W does.
+
+
+Uploaded image
+Uploaded image
+can we do a simple test on the motors
+
+Yes—before mixing Bluetooth + web + WASD, let’s do a simple direct motor test. This isolates everything and tells us if your wiring + shield are correct.
+
+✅ SUPER SIMPLE MOTOR TEST (no Bluetooth)
+Upload this:
+
+#include <AFMotor.h>
+
+// Motors
+AF_DCMotor m1(1);
+AF_DCMotor m2(2);
+AF_DCMotor m3(3);
+AF_DCMotor m4(4);
+
+void setup() {
+  Serial.begin(9600);
+
+  m1.setSpeed(150);
+  m2.setSpeed(150);
+  m3.setSpeed(150);
+  m4.setSpeed(150);
+
+  Serial.println("Starting test...");
+}
+
+void loop() {
+
+  // Step 1: All forward
+  Serial.println("Forward");
+  m1.run(FORWARD);
+  m2.run(FORWARD);
+  m3.run(FORWARD);
+  m4.run(FORWARD);
+  delay(3000);
+
+  // Step 2: All backward
+  Serial.println("Backward");
+  m1.run(BACKWARD);
+  m2.run(BACKWARD);
+  m3.run(BACKWARD);
+  m4.run(BACKWARD);
+  delay(3000);
+
+  // Step 3: Stop
+  Serial.println("Stop");
+  m1.run(RELEASE);
+  m2.run(RELEASE);
+  m3.run(RELEASE);
+  m4.run(RELEASE);
+  delay(3000);
+}
+🔍 What should happen
+All wheels spin forward for 3 seconds
+
+All wheels spin backward for 3 seconds
+
+All stop
+
+🚨 If something is wrong
+Case 1: Nothing moves
+Check:
+
+motor battery connected to EXT_PWR
+
+jumper on shield
+
+battery not dead
+
+Case 2: Only some motors move
+That motor port is correct
+
+The others:
+
+wiring loose
+
+wrong port
+
+Case 3: Motors spin opposite directions
+That’s normal—you just flip direction later in code.
+
+🔥 VERY IMPORTANT (your setup)
+You’re using:
+
+9V batteries
+
+So:
+👉 If motors twitch or reset Arduino → power is too weak
+
+Try:
+
+m1.setSpeed(100);
+🎯 Next step after this works
+Once this passes, we’ll do:
+
+One motor at a time test
+
+Then left/right grouping
+
+Then plug back into Bluetooth
+
+⚠️ About your Netlify error
+The “Page not found” means:
+
+👉 You don’t have:
+
+index.html
+in the root of your project.
+
+Fix:
+
+rename your file to index.html
+
+redeploy
+
+👉 Tell me this after running the test:
+Do all 4 motors spin?
+
+Which ones spin wrong direction?
+
+I’ll map your exact wiring so your car drives perfectly.
+
+
+can you make it so we can see what the current input it is from the website to the bluettoth also
+
+Yes — add a live sent-command display on the page so you can see exactly what the website is trying to send to the HM-10.
+
+Use this updated index.html. It shows:
+
+connection status
+
+keys pressed
+
+current command built from keys
+
+last command actually sent to Bluetooth
+
+a small event log
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BLE Car Control</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b, #0b1120);
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1050px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 28px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.2rem;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: #cbd5e1;
+      font-size: 1rem;
+    }
+
+    .connect-btn {
+      background: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 22px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 1.2rem;
+      margin-bottom: 14px;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: bold;
+      background: #7f1d1d;
+      color: #fecaca;
+      margin-bottom: 14px;
+    }
+
+    .status-pill.connected {
+      background: #14532d;
+      color: #bbf7d0;
+    }
+
+    .info-row {
+      margin: 12px 0;
+      font-size: 1rem;
+      color: #e2e8f0;
+    }
+
+    .highlight {
+      color: #38bdf8;
+      font-weight: bold;
+    }
+
+    .instructions {
+      line-height: 1.7;
+      color: #e2e8f0;
+    }
+
+    .keys-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .key-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .key {
+      width: 72px;
+      height: 72px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 16px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      transition: all 0.12s ease;
+      user-select: none;
+    }
+
+    .key.active {
+      background: #38bdf8;
+      color: #082f49;
+      border-color: #7dd3fc;
+      transform: scale(1.04);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+    }
+
+    .command-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .command-box {
+      text-align: center;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .command-label {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+    }
+
+    .command-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #f8fafc;
+      letter-spacing: 1px;
+    }
+
+    .log {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      height: 160px;
+      overflow: auto;
+      font-family: Consolas, monospace;
+      font-size: 0.92rem;
+      color: #dbeafe;
+      white-space: pre-wrap;
+    }
+
+    .legend {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      color: #e2e8f0;
+      font-size: 0.96rem;
+    }
+
+    @media (max-width: 850px) {
+      .grid { grid-template-columns: 1fr; }
+      h1 { font-size: 1.8rem; }
+      .key { width: 64px; height: 64px; }
+      .command-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <h1>BLE Car Control</h1>
+        <div class="subtitle">HM-10 keyboard controller with live command display</div>
+      </div>
+      <button class="connect-btn" onclick="connectBLE()">Connect Device</button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Connection & Instructions</h2>
+        <div id="status" class="status-pill">Not Connected</div>
+
+        <div class="info-row">Device: <span id="deviceName" class="highlight">None</span></div>
+        <div class="info-row">Keys Pressed: <span id="pressedKeys" class="highlight">None</span></div>
+
+        <div class="instructions">
+          <p>1. Click <strong>Connect Device</strong>.</p>
+          <p>2. Choose your <strong>HM-10</strong> in the popup.</p>
+          <p>3. Use <strong>W A S D</strong> to send commands.</p>
+          <p>4. Hold two keys for combined movement.</p>
+          <p>5. Release all keys to send stop.</p>
+        </div>
+
+        <div class="log" id="eventLog"></div>
+      </div>
+
+      <div class="card">
+        <h2>Live Control Panel</h2>
+
+        <div class="keys-panel">
+          <div class="key-row">
+            <div id="key-w" class="key">W</div>
+          </div>
+          <div class="key-row">
+            <div id="key-a" class="key">A</div>
+            <div id="key-s" class="key">S</div>
+            <div id="key-d" class="key">D</div>
+          </div>
+        </div>
+
+        <div class="command-grid">
+          <div class="command-box">
+            <div class="command-label">Current Input</div>
+            <div id="commandValue" class="command-value">X</div>
+          </div>
+
+          <div class="command-box">
+            <div class="command-label">Last Sent to Bluetooth</div>
+            <div id="lastSentValue" class="command-value">—</div>
+          </div>
+        </div>
+
+        <div class="legend">
+          <div><strong>W</strong> = Forward</div>
+          <div><strong>S</strong> = Backward</div>
+          <div><strong>A</strong> = Left</div>
+          <div><strong>D</strong> = Right</div>
+          <div><strong>W + A</strong> = FL</div>
+          <div><strong>W + D</strong> = FR</div>
+          <div><strong>S + A</strong> = BL</div>
+          <div><strong>S + D</strong> = BR</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let characteristic = null;
+    let pressed = new Set();
+    let lastSent = "";
+
+    const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
+    const CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+
+    function logMessage(msg) {
+      const log = document.getElementById("eventLog");
+      const time = new Date().toLocaleTimeString();
+      log.textContent = `[${time}] ${msg}\n` + log.textContent;
+    }
+
+    function updatePressedKeys() {
+      const keys = Array.from(pressed).map(k => k.toUpperCase()).join(", ");
+      document.getElementById("pressedKeys").textContent = keys || "None";
+
+      ["w", "a", "s", "d"].forEach(k => {
+        const el = document.getElementById(`key-${k}`);
+        if (pressed.has(k)) el.classList.add("active");
+        else el.classList.remove("active");
+      });
+    }
+
+    function buildCommand() {
+      const hasW = pressed.has("w");
+      const hasA = pressed.has("a");
+      const hasS = pressed.has("s");
+      const hasD = pressed.has("d");
+
+      let cmd = "";
+      if (hasW) cmd += "F";
+      if (hasS) cmd += "B";
+      if (hasA) cmd += "L";
+      if (hasD) cmd += "R";
+      if (cmd === "") cmd = "X";
+
+      return cmd;
+    }
+
+    function updateCommandDisplay(cmd) {
+      document.getElementById("commandValue").textContent = cmd;
+    }
+
+    function updateLastSentDisplay(cmd) {
+      document.getElementById("lastSentValue").textContent = cmd;
+    }
+
+    async function sendCommand(cmd) {
+      updateCommandDisplay(cmd);
+
+      if (!characteristic) {
+        logMessage(`Not sent (not connected): ${cmd}`);
+        return;
+      }
+
+      if (cmd === lastSent) return;
+
+      try {
+        const data = new TextEncoder().encode(cmd);
+        await characteristic.writeValue(data);
+        lastSent = cmd;
+        updateLastSentDisplay(cmd);
+        logMessage(`Sent to Bluetooth: ${cmd}`);
+      } catch (error) {
+        logMessage(`Send failed for ${cmd}`);
+        console.error(error);
+      }
+    }
+
+    async function updateAndSend() {
+      updatePressedKeys();
+      const cmd = buildCommand();
+      await sendCommand(cmd);
+    }
+
+    async function connectBLE() {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ namePrefix: "HM" }],
+          optionalServices: [SERVICE_UUID]
+        });
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService(SERVICE_UUID);
+        characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+
+        document.getElementById("deviceName").textContent = device.name || "HM-10";
+
+        const status = document.getElementById("status");
+        status.textContent = "Connected";
+        status.classList.add("connected");
+
+        logMessage(`Connected to ${device.name || "HM-10"}`);
+      } catch (error) {
+        logMessage("Connection failed");
+        console.error(error);
+        alert("Connection failed. Make sure Chrome/Edge is used and the HM-10 is powered.");
+      }
+    }
+
+    document.addEventListener("keydown", async (e) => {
+      const key = e.key.toLowerCase();
+      if (!["w", "a", "s", "d"].includes(key)) return;
+
+      e.preventDefault();
+
+      if (!pressed.has(key)) {
+        pressed.add(key);
+        await updateAndSend();
+      }
+    });
+
+    document.addEventListener("keyup", async (e) => {
+      const key = e.key.toLowerCase();
+      if (!["w", "a", "s", "d"].includes(key)) return;
+
+      e.preventDefault();
+
+      if (pressed.has(key)) {
+        pressed.delete(key);
+        await updateAndSend();
+      }
+    });
+
+    updatePressedKeys();
+    updateCommandDisplay("X");
+    updateLastSentDisplay("—");
+    logMessage("Page ready");
+  </script>
+</body>
+</html>
+And on the Arduino side, if you want to verify what actually arrives from Bluetooth, use this:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Serial.println("Ready...");
+}
+
+void loop() {
+  if (BT.available()) {
+    String cmd = BT.readString();
+    cmd.trim();
+    if (cmd.length() > 0) {
+      Serial.print("Received from BLE: ");
+      Serial.println(cmd);
+    }
+  }
+}
+So now you can compare:
+
+Current Input = what keys on the website are building
+
+Last Sent to Bluetooth = what the page actually wrote
+
+Serial Monitor = what Arduino actually received
+
+If you want, next I can make the page show a big green “sent successfully” badge and a red “not connected” warning banner.
+
+
+on the arduino code I want you sto still send these commands to the motors I just want to also print on to the serial monitor
+
+Perfect—that’s exactly how you should do it 👍
+We’ll keep the motors running AND print everything to Serial so you can debug.
+
+✅ Final Arduino Code (motors + print)
+#include <AFMotor.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+// Motors
+AF_DCMotor m1(1); // Front Left
+AF_DCMotor m2(2); // Back Left
+AF_DCMotor m3(3); // Back Right
+AF_DCMotor m4(4); // Front Right
+
+int speedVal = 130;
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+
+  m1.setSpeed(speedVal);
+  m2.setSpeed(speedVal);
+  m3.setSpeed(speedVal);
+  m4.setSpeed(speedVal);
+
+  stopMotors();
+  Serial.println("System Ready...");
+}
+
+void loop() {
+  if (BT.available()) {
+    String cmd = BT.readString();
+    cmd.trim();
+
+    if (cmd.length() > 0) {
+      Serial.print("Received: ");
+      Serial.println(cmd);
+
+      handleCommand(cmd);
+    }
+  }
+}
+
+void handleCommand(String cmd) {
+
+  if (cmd == "F") {
+    Serial.println("Action: Forward");
+    forward();
+
+  } else if (cmd == "B") {
+    Serial.println("Action: Backward");
+    backward();
+
+  } else if (cmd == "L") {
+    Serial.println("Action: Left");
+    left();
+
+  } else if (cmd == "R") {
+    Serial.println("Action: Right");
+    right();
+
+  } else if (cmd == "FL") {
+    Serial.println("Action: Forward-Left");
+    forwardLeft();
+
+  } else if (cmd == "FR") {
+    Serial.println("Action: Forward-Right");
+    forwardRight();
+
+  } else if (cmd == "BL") {
+    Serial.println("Action: Back-Left");
+    backLeft();
+
+  } else if (cmd == "BR") {
+    Serial.println("Action: Back-Right");
+    backRight();
+
+  } else if (cmd == "X") {
+    Serial.println("Action: Stop");
+    stopMotors();
+  }
+}
+
+// -------- MOVEMENT FUNCTIONS --------
+
+void forward() {
+  m1.run(FORWARD);
+  m2.run(FORWARD);
+  m3.run(FORWARD);
+  m4.run(FORWARD);
+}
+
+void backward() {
+  m1.run(BACKWARD);
+  m2.run(BACKWARD);
+  m3.run(BACKWARD);
+  m4.run(BACKWARD);
+}
+
+void left() {
+  m1.run(BACKWARD);
+  m2.run(BACKWARD);
+  m3.run(FORWARD);
+  m4.run(FORWARD);
+}
+
+void right() {
+  m1.run(FORWARD);
+  m2.run(FORWARD);
+  m3.run(BACKWARD);
+  m4.run(BACKWARD);
+}
+
+void forwardLeft() {
+  m1.run(RELEASE);
+  m2.run(RELEASE);
+  m3.run(FORWARD);
+  m4.run(FORWARD);
+}
+
+void forwardRight() {
+  m1.run(FORWARD);
+  m2.run(FORWARD);
+  m3.run(RELEASE);
+  m4.run(RELEASE);
+}
+
+void backLeft() {
+  m1.run(RELEASE);
+  m2.run(RELEASE);
+  m3.run(BACKWARD);
+  m4.run(BACKWARD);
+}
+
+void backRight() {
+  m1.run(BACKWARD);
+  m2.run(BACKWARD);
+  m3.run(RELEASE);
+  m4.run(RELEASE);
+}
+
+void stopMotors() {
+  m1.run(RELEASE);
+  m2.run(RELEASE);
+  m3.run(RELEASE);
+  m4.run(RELEASE);
+}
+🔍 What you’ll see in Serial Monitor
+When you press keys on your website:
+
+Received: F
+Action: Forward
+Received: FL
+Action: Forward-Left
+Received: X
+Action: Stop
+💡 Why this is powerful
+Now you can verify:
+
+Website	Serial Monitor	Motors
+W	F	Forward
+W + A	FL	Forward-left
+release	X	Stop
+So if something goes wrong, you instantly know:
+
+❌ Website issue
+
+❌ Bluetooth issue
+
+❌ Motor mapping issue
+
+⚠️ If motors behave weird
+Tell me:
+
+what happens when you press W
+
+what happens when you press A
+
+I’ll fix your motor directions exactly (this is always slightly different per build).
+
+🚀 You’re basically done
+At this point you have:
+
+BLE website control
+
+WASD multi-key input
+
+real-time debugging
+
+motor control
+
+👉 This is actually a very strong project for class
+
+If you want next level:
+
+smoother turning (PWM difference)
+
+speed slider on website
+
+joystick instead of WASD
+
+I can help you upgrade it.
+
+
+can we do a simple test to get values from the website because I am not. I dont want to map out the keys anymore I want to keep them simple WASD 
+
+Yes. Let’s make it very simple again:
+
+website sends exactly W, A, S, D
+
+when you let go, it sends X
+
+Arduino prints what it got
+
+motors can still use those same letters later
+
+Simple website test
+Use this as your index.html:
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simple WASD BLE Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      margin: 0;
+      padding: 24px;
+    }
+
+    .box {
+      max-width: 700px;
+      margin: 0 auto;
+      background: #1e293b;
+      padding: 24px;
+      border-radius: 16px;
+    }
+
+    button {
+      padding: 12px 18px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: #22c55e;
+      color: white;
+      font-weight: bold;
+    }
+
+    .status, .current, .sent {
+      margin-top: 16px;
+      font-size: 18px;
+    }
+
+    .big {
+      font-size: 32px;
+      font-weight: bold;
+      color: #38bdf8;
+    }
+
+    .log {
+      margin-top: 20px;
+      background: #0b1220;
+      padding: 14px;
+      border-radius: 10px;
+      min-height: 120px;
+      white-space: pre-wrap;
+      font-family: Consolas, monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Simple WASD BLE Test</h1>
+    <p>Press W, A, S, D. Releasing sends X.</p>
+
+    <button onclick="connectBLE()">Connect</button>
+
+    <div class="status">Status: <span id="status">Not Connected</span></div>
+    <div class="current">Current key: <span id="current" class="big">None</span></div>
+    <div class="sent">Last sent: <span id="lastSent" class="big">None</span></div>
+
+    <div class="log" id="log">Page ready\n</div>
+  </div>
+
+  <script>
+    let characteristic = null;
+    let activeKey = null;
+
+    const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
+    const CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
+
+    function addLog(msg) {
+      const log = document.getElementById("log");
+      const time = new Date().toLocaleTimeString();
+      log.textContent = `[${time}] ${msg}\n` + log.textContent;
+    }
+
+    async function connectBLE() {
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          filters: [{ namePrefix: "HM" }],
+          optionalServices: [SERVICE_UUID]
+        });
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService(SERVICE_UUID);
+        characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+
+        document.getElementById("status").textContent = "Connected to " + (device.name || "HM-10");
+        addLog("Connected");
+      } catch (err) {
+        console.error(err);
+        addLog("Connection failed");
+      }
+    }
+
+    async function sendValue(val) {
+      document.getElementById("lastSent").textContent = val;
+
+      if (!characteristic) {
+        addLog("Not connected, did not send: " + val);
+        return;
+      }
+
+      try {
+        const data = new TextEncoder().encode(val);
+        await characteristic.writeValue(data);
+        addLog("Sent: " + val);
+      } catch (err) {
+        console.error(err);
+        addLog("Failed to send: " + val);
+      }
+    }
+
+    document.addEventListener("keydown", async (e) => {
+      const key = e.key.toUpperCase();
+
+      if (!["W", "A", "S", "D"].includes(key)) return;
+      if (activeKey === key) return;
+
+      activeKey = key;
+      document.getElementById("current").textContent = key;
+      await sendValue(key);
+    });
+
+    document.addEventListener("keyup", async (e) => {
+      const key = e.key.toUpperCase();
+
+      if (!["W", "A", "S", "D"].includes(key)) return;
+
+      if (activeKey === key) {
+        activeKey = null;
+        document.getElementById("current").textContent = "None";
+        await sendValue("X");
+      }
+    });
+  </script>
+</body>
+</html>
+Simple Arduino test
+This just prints what the website sent:
+
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(10, 9); // RX, TX
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+  Serial.println("Ready...");
+}
+
+void loop() {
+  if (BT.available()) {
+    char c = BT.read();
+
+    Serial.print("Received: ");
+    Serial.println(c);
+  }
+}
+What you should see
+When you press:
+
+W → Serial Monitor shows Received: W
+
+A → Received: A
+
+S → Received: S
+
+D → Received: D
+
+release key → Received: X
+
+Then motor mapping stays simple
+Later, you can use:
+
+W = forward
+
+A = left
+
+S = backward
+
+D = right
+
+X = stop
+
+So this gives you the cleanest possible test first.
+
+
+Uploaded image
+there's an issue when I click w it goes striaght away to x which makes it stop and then when I long press W the motor just keeps going on and on
+
+
+Thought for 13s
+Yes — I see the issue.
+
+What’s happening is:
+
+a quick tap on W sends W
+
+then your browser immediately sends keyup
+
+your page sends X
+
+so the car stops right away
+
+And when you hold W, sometimes the release is not handled the way you expect, so it keeps running.
+
+For motor testing, the easiest fix is:
+
+W, A, S, D send exactly those letters
+
+do not auto-send X on key release
+
+add a big STOP button
+
+also make Spacebar send X
+
+send X if the page loses focus, for safety
+
+That gives you much more predictable testing.
+
+Use this website code
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -352,3 +5439,148 @@
   </script>
 </body>
 </html>
+And use this Arduino code
+This still drives the motors, but now it uses simple letters:
+
+W = forward
+
+A = left
+
+S = backward
+
+D = right
+
+X = stop
+
+#include <AFMotor.h>
+#include <SoftwareSerial.h>
+
+SoftwareSerial BT(9, 10); // RX, TX
+
+AF_DCMotor m1(1); // Front Left
+AF_DCMotor m2(2); // Back Left
+AF_DCMotor m3(3); // Back Right
+AF_DCMotor m4(4); // Front Right
+
+int speedVal = 130;
+
+void setup() {
+  Serial.begin(9600);
+  BT.begin(9600);
+
+  m1.setSpeed(speedVal);
+  m2.setSpeed(speedVal);
+  m3.setSpeed(speedVal);
+  m4.setSpeed(speedVal);
+
+  stopMotors();
+  Serial.println("System Ready...");
+}
+
+void loop() {
+  if (BT.available()) {
+    char cmd = BT.read();
+
+    Serial.print("Received: ");
+    Serial.println(cmd);
+
+    handleCommand(cmd);
+  }
+}
+
+void handleCommand(char cmd) {
+  if (cmd == 'W') {
+    Serial.println("Action: Forward");
+    forward();
+  }
+  else if (cmd == 'S') {
+    Serial.println("Action: Backward");
+    backward();
+  }
+  else if (cmd == 'A') {
+    Serial.println("Action: Left");
+    left();
+  }
+  else if (cmd == 'D') {
+    Serial.println("Action: Right");
+    right();
+  }
+  else if (cmd == 'X') {
+    Serial.println("Action: Stop");
+    stopMotors();
+  }
+}
+
+void forward() {
+  m1.run(FORWARD);
+  m2.run(FORWARD);
+  m3.run(FORWARD);
+  m4.run(FORWARD);
+}
+
+void backward() {
+  m1.run(BACKWARD);
+  m2.run(BACKWARD);
+  m3.run(BACKWARD);
+  m4.run(BACKWARD);
+}
+
+void left() {
+  m1.run(BACKWARD);
+  m2.run(BACKWARD);
+  m3.run(FORWARD);
+  m4.run(FORWARD);
+}
+
+void right() {
+  m1.run(FORWARD);
+  m2.run(FORWARD);
+  m3.run(BACKWARD);
+  m4.run(BACKWARD);
+}
+
+void stopMotors() {
+  m1.run(RELEASE);
+  m2.run(RELEASE);
+  m3.run(RELEASE);
+  m4.run(RELEASE);
+}
+Important note
+Your screenshot showed you were using:
+
+SoftwareSerial BT(9, 10); // RX, TX
+So the wiring must match that:
+
+HM-10 TX → Arduino pin 9
+
+HM-10 RX → Arduino pin 10
+
+What this fixes
+tapping W no longer instantly sends X
+
+long press does not spam repeats
+
+you stop only when you press STOP or Spacebar
+
+if the page loses focus, it sends X for safety
+
+Test this first with the wheels lifted off the ground.
+
+
+okay everything is working out good but when I am turning left and right is possible to make it make it much smoother. like if I am clicking w it goes straight forward until I dont press it anymore. but when I click w and D it goes forward and left and vise versa. also when I do these turns is possible to run the right wheels at full speed and then the left wheels at a lower speed to make it smoother 
+
+Cancel
+
+Send
+
+
+Thought for 13s
+Answer now
+Yes — that’s the right way to do it.
+
+For smoother turning, don’t make one side
+
+
+
+
+Editing message
