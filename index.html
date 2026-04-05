@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BLE Car Control</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -23,7 +21,7 @@
 
     .container {
       width: 100%;
-      max-width: 1000px;
+      max-width: 1050px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 24px;
@@ -61,12 +59,6 @@
       font-size: 1rem;
       cursor: pointer;
       font-weight: bold;
-      transition: transform 0.15s ease, opacity 0.15s ease;
-    }
-
-    .connect-btn:hover {
-      transform: translateY(-1px);
-      opacity: 0.95;
     }
 
     .grid {
@@ -119,10 +111,6 @@
       color: #e2e8f0;
     }
 
-    .instructions strong {
-      color: #ffffff;
-    }
-
     .keys-panel {
       display: flex;
       flex-direction: column;
@@ -159,8 +147,14 @@
       box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
     }
 
-    .command-box {
+    .command-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
       margin-top: 18px;
+    }
+
+    .command-box {
       text-align: center;
       padding: 16px;
       border-radius: 16px;
@@ -181,6 +175,20 @@
       letter-spacing: 1px;
     }
 
+    .log {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      height: 160px;
+      overflow: auto;
+      font-family: Consolas, monospace;
+      font-size: 0.92rem;
+      color: #dbeafe;
+      white-space: pre-wrap;
+    }
+
     .legend {
       margin-top: 14px;
       display: grid;
@@ -190,26 +198,11 @@
       font-size: 0.96rem;
     }
 
-    .footer-note {
-      margin-top: 22px;
-      color: #94a3b8;
-      font-size: 0.92rem;
-      line-height: 1.6;
-    }
-
-    @media (max-width: 800px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      h1 {
-        font-size: 1.8rem;
-      }
-
-      .key {
-        width: 64px;
-        height: 64px;
-      }
+    @media (max-width: 850px) {
+      .grid { grid-template-columns: 1fr; }
+      h1 { font-size: 1.8rem; }
+      .key { width: 64px; height: 64px; }
+      .command-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -218,7 +211,7 @@
     <div class="topbar">
       <div>
         <h1>BLE Car Control</h1>
-        <div class="subtitle">WASD keyboard control for HM-10 Bluetooth car</div>
+        <div class="subtitle">HM-10 keyboard controller with live command display</div>
       </div>
       <button class="connect-btn" onclick="connectBLE()">Connect Device</button>
     </div>
@@ -232,18 +225,14 @@
         <div class="info-row">Keys Pressed: <span id="pressedKeys" class="highlight">None</span></div>
 
         <div class="instructions">
-          <p><strong>How to use:</strong></p>
           <p>1. Click <strong>Connect Device</strong>.</p>
-          <p>2. Select your HM-10 BLE module from the browser popup.</p>
-          <p>3. Use <strong>W, A, S, D</strong> on your keyboard to control the car.</p>
-          <p>4. You can hold <strong>two keys at once</strong> for combined movement like forward-left or forward-right.</p>
-          <p>5. Releasing all keys sends a stop command.</p>
+          <p>2. Choose your <strong>HM-10</strong> in the popup.</p>
+          <p>3. Use <strong>W A S D</strong> to send commands.</p>
+          <p>4. Hold two keys for combined movement.</p>
+          <p>5. Release all keys to send stop.</p>
         </div>
 
-        <div class="footer-note">
-          Best used in Chrome or Edge with Bluetooth enabled.
-          Your HM-10 should already be powered and ready before connecting.
-        </div>
+        <div class="log" id="eventLog"></div>
       </div>
 
       <div class="card">
@@ -260,9 +249,16 @@
           </div>
         </div>
 
-        <div class="command-box">
-          <div class="command-label">Current Command</div>
-          <div id="commandValue" class="command-value">X</div>
+        <div class="command-grid">
+          <div class="command-box">
+            <div class="command-label">Current Input</div>
+            <div id="commandValue" class="command-value">X</div>
+          </div>
+
+          <div class="command-box">
+            <div class="command-label">Last Sent to Bluetooth</div>
+            <div id="lastSentValue" class="command-value">—</div>
+          </div>
         </div>
 
         <div class="legend">
@@ -270,10 +266,10 @@
           <div><strong>S</strong> = Backward</div>
           <div><strong>A</strong> = Left</div>
           <div><strong>D</strong> = Right</div>
-          <div><strong>W + A</strong> = Forward Left</div>
-          <div><strong>W + D</strong> = Forward Right</div>
-          <div><strong>S + A</strong> = Back Left</div>
-          <div><strong>S + D</strong> = Back Right</div>
+          <div><strong>W + A</strong> = FL</div>
+          <div><strong>W + D</strong> = FR</div>
+          <div><strong>S + A</strong> = BL</div>
+          <div><strong>S + D</strong> = BR</div>
         </div>
       </div>
     </div>
@@ -283,13 +279,14 @@
     let characteristic = null;
     let pressed = new Set();
     let lastSent = "";
-    let connectedDeviceName = "None";
 
     const SERVICE_UUID = "0000ffe0-0000-1000-8000-00805f9b34fb";
     const CHARACTERISTIC_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
 
-    function updateUICommand(cmd) {
-      document.getElementById("commandValue").textContent = cmd;
+    function logMessage(msg) {
+      const log = document.getElementById("eventLog");
+      const time = new Date().toLocaleTimeString();
+      log.textContent = `[${time}] ${msg}\n` + log.textContent;
     }
 
     function updatePressedKeys() {
@@ -310,28 +307,42 @@
       const hasD = pressed.has("d");
 
       let cmd = "";
-
       if (hasW) cmd += "F";
       if (hasS) cmd += "B";
       if (hasA) cmd += "L";
       if (hasD) cmd += "R";
-
       if (cmd === "") cmd = "X";
+
       return cmd;
     }
 
-    async function sendCommand(cmd) {
-      updateUICommand(cmd);
+    function updateCommandDisplay(cmd) {
+      document.getElementById("commandValue").textContent = cmd;
+    }
 
-      if (!characteristic) return;
+    function updateLastSentDisplay(cmd) {
+      document.getElementById("lastSentValue").textContent = cmd;
+    }
+
+    async function sendCommand(cmd) {
+      updateCommandDisplay(cmd);
+
+      if (!characteristic) {
+        logMessage(`Not sent (not connected): ${cmd}`);
+        return;
+      }
+
       if (cmd === lastSent) return;
 
       try {
         const data = new TextEncoder().encode(cmd);
         await characteristic.writeValue(data);
         lastSent = cmd;
+        updateLastSentDisplay(cmd);
+        logMessage(`Sent to Bluetooth: ${cmd}`);
       } catch (error) {
-        console.error("Send failed:", error);
+        logMessage(`Send failed for ${cmd}`);
+        console.error(error);
       }
     }
 
@@ -352,21 +363,25 @@
         const service = await server.getPrimaryService(SERVICE_UUID);
         characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
 
-        connectedDeviceName = device.name || "HM-10";
-        document.getElementById("deviceName").textContent = connectedDeviceName;
+        document.getElementById("deviceName").textContent = device.name || "HM-10";
 
         const status = document.getElementById("status");
         status.textContent = "Connected";
         status.classList.add("connected");
+
+        logMessage(`Connected to ${device.name || "HM-10"}`);
       } catch (error) {
+        logMessage("Connection failed");
         console.error(error);
-        alert("Connection failed. Make sure you're using Chrome/Edge and the HM-10 is powered on.");
+        alert("Connection failed. Make sure Chrome/Edge is used and the HM-10 is powered.");
       }
     }
 
     document.addEventListener("keydown", async (e) => {
       const key = e.key.toLowerCase();
       if (!["w", "a", "s", "d"].includes(key)) return;
+
+      e.preventDefault();
 
       if (!pressed.has(key)) {
         pressed.add(key);
@@ -378,6 +393,8 @@
       const key = e.key.toLowerCase();
       if (!["w", "a", "s", "d"].includes(key)) return;
 
+      e.preventDefault();
+
       if (pressed.has(key)) {
         pressed.delete(key);
         await updateAndSend();
@@ -385,7 +402,9 @@
     });
 
     updatePressedKeys();
-    updateUICommand("X");
+    updateCommandDisplay("X");
+    updateLastSentDisplay("—");
+    logMessage("Page ready");
   </script>
 </body>
 </html>
