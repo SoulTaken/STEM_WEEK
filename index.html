@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WASD Multi-Key Control</title>
+</head>
+<body>
+  <h2>WASD Multi-Key Control</h2>
+  <button onclick="connectBLE()">Connect</button>
+
+  <script>
+    let characteristic;
+    let keys = new Set();
+
+    async function connectBLE() {
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [{ namePrefix: "HM" }],
+        optionalServices: ["0000ffe0-0000-1000-8000-00805f9b34fb"]
+      });
+
+      const server = await device.gatt.connect();
+      const service = await server.getPrimaryService("0000ffe0-0000-1000-8000-00805f9b34fb");
+      characteristic = await service.getCharacteristic("0000ffe1-0000-1000-8000-00805f9b34fb");
+
+      alert("Connected!");
+    }
+
+    async function send(cmd) {
+      if (!characteristic) return;
+      const data = new TextEncoder().encode(cmd);
+      await characteristic.writeValue(data);
+      console.log("Sent:", cmd);
+    }
+
+    function updateCommand() {
+      let cmd = "";
+
+      if (keys.has("w")) cmd += "w";
+      if (keys.has("s")) cmd += "s";
+      if (keys.has("a")) cmd += "a";
+      if (keys.has("d")) cmd += "d";
+
+      if (cmd === "") cmd = "X"; // stop
+
+      send(cmd);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      const key = e.key.toLowerCase();
+      if (["w","a","s","d"].includes(key)) {
+        keys.add(key);
+        updateCommand();
+      }
+    });
+
+    document.addEventListener("keyup", (e) => {
+      const key = e.key.toLowerCase();
+      if (["w","a","s","d"].includes(key)) {
+        keys.delete(key);
+        updateCommand();
+      }
+    });
+  </script>
+</body>
+</html>
